@@ -13,7 +13,7 @@
   "publisher": "sunrishe",
   "license": "GPL-3.0",
   "version": "1.0.0",
-  "icon": "public/favicon.ico",
+  "icon": "public/ic_launcher.png",
   "qna": "https://github.com/sunrishe/legado-vscode/issues",
   "bugs": {
     "url": "https://github.com/sunrishe/legado-vscode/issues",
