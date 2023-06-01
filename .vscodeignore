@@ -5,9 +5,12 @@ node_modules/**
 src/**
 .gitignore
 .yarnrc
-webpack.config.js
 vsc-extension-quickstart.md
-**/tsconfig.json
+webpack.config.js
 **/.eslintrc.json
 **/*.map
 **/*.ts
+**/tsconfig.json
+# 打包.vsix文件时排除web目录下除了构建成果之外的内容
+!web/dist
+web/**
