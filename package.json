@@ -1,0 +1,96 @@
+{
+  "name": "legado-vscode",
+  "displayName": "阅读APP",
+  "description": "配合阅读APP用来摸鱼或学习的小说阅读插件。",
+  "keywords": [
+    "legado",
+    "阅读",
+    "阅读3.0",
+    "阅读APP",
+    "小说",
+    "摸鱼"
+  ],
+  "publisher": "sunrishe",
+  "license": "GPL-3.0",
+  "version": "1.0.0",
+  "icon": "public/favicon.ico",
+  "qna": "https://github.com/sunrishe/legado-vscode/issues",
+  "bugs": {
+    "url": "https://github.com/sunrishe/legado-vscode/issues",
+    "email": "i@sunrishe.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sunrishe/legado-vscode.git"
+  },
+  "engines": {
+    "vscode": "^1.25.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:legado-vscode.openLegado"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "legado-vscode.openLegado",
+        "title": "打开阅读书架",
+        "category": "legado-vscode"
+      }
+    ],
+    "configuration": {
+      "title": "阅读插件",
+      "type": "object",
+      "properties": {
+        "legado-vscode.panelTitle": {
+          "type": "string",
+          "default": "阅读",
+          "description": "Tab页标题，默认阅读"
+        },
+        "legado-vscode.webServeUrl": {
+          "type": "string",
+          "default": "http://192.168.104.62:1122",
+          "description": "阅读APP的WEB服务访问地址"
+        }
+      }
+    }
+  },
+  "private": true,
+  "workspaces": [
+    "web"
+  ],
+  "scripts": {
+    "build": "yarn --cwd web run build && vsce package",
+    "vscode:prepublish": "yarn run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "watch:all": "concurrently \"yarn --cwd web run watch\" \"yarn run watch\"",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "yarn run compile-tests && yarn run compile && yarn run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
+    "@types/vscode": "^1.25.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.1",
+    "@typescript-eslint/parser": "^5.59.1",
+    "@vscode/test-electron": "^2.3.0",
+    "concurrently": "^8.0.1",
+    "eslint": "^8.39.0",
+    "glob": "^8.1.0",
+    "mocha": "^10.2.0",
+    "ts-loader": "^9.4.2",
+    "typescript": "^5.0.4",
+    "vsce": "^2.15.0",
+    "webpack": "^5.81.0",
+    "webpack-cli": "^5.0.2"
+  }
+}
