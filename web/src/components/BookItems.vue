@@ -69,6 +69,9 @@ const subJustify = computed(() =>
 <style lang="scss" scoped>
 .books-wrapper {
   overflow: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
   &::-webkit-scrollbar {
     display: none;
   }
