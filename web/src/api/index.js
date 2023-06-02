@@ -1,10 +1,11 @@
 import ajax from "./axios";
+import WEB from "@/api/web";
 import { ElMessage } from "element-plus/es";
 
 /** https://github.com/gedoor/legado/tree/master/app/src/main/java/io/legado/app/api */
 /** https://github.com/gedoor/legado/tree/master/app/src/main/java/io/legado/app/web */
 
-const { hostname, port } = new URL(window.legadoWebServeUrl || import.meta.env.VITE_API || location.origin);
+const { hostname, port } = new URL(WEB.getLegadoWebServeUrl());
 
 const isSourecEditor = /source/i.test(location.href);
 const APIExceptionHandler = (error) => {
@@ -29,7 +30,7 @@ const saveBookProgressWithBeacon = (bookProgress) => {
   if (!bookProgress) return;
   // 常规请求可能会被取消 使用Fetch keep-alive 或者 navigator.sendBeacon
   navigator.sendBeacon(
-    `${window.legadoWebServeUrl || import.meta.env.VITE_API || location.origin}/saveBookProgress`,
+    `${WEB.getLegadoWebServeUrl()}/saveBookProgress`,
     JSON.stringify(bookProgress)
   );
 };

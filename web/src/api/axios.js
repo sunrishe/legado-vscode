@@ -1,9 +1,10 @@
 import axios from "axios";
+import WEB from "@/api/web";
 
 const SECOND = 1000;
 
 const ajax = axios.create({
-  baseURL: window.legadoWebServeUrl || import.meta.env.VITE_API || location.origin,
+  baseURL: WEB.getLegadoWebServeUrl(),
   timeout: 120 * SECOND,
 });
 

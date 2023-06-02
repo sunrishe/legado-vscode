@@ -50,13 +50,14 @@
 </template>
 <script setup>
 import { dateFormat } from "../utils/utils";
+import WEB from "@/api/web";
 const props = defineProps(["books", "isSearch"]);
 const emit = defineEmits(["bookClick"]);
 const handleClick = (book) => emit("bookClick", book);
 const getCover = (coverUrl) => {
   return /^data:/.test(coverUrl)
     ? coverUrl
-    : (window.legadoWebServeUrl || import.meta.env.VITE_API || location.origin) +
+    : WEB.getLegadoWebServeUrl() +
         "/cover?path=" +
         encodeURIComponent(coverUrl);
 };

@@ -10,6 +10,30 @@ export class WebAppPanel {
   private readonly _extensionUri: vscode.Uri;
   private _disposables: vscode.Disposable[] = [];
 
+  private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
+    this._panel = panel;
+    this._extensionUri = extensionUri;
+
+    // Set the webview's initial html content
+    this._update();
+
+    this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
+
+    // Update the content based on view changes
+    this._panel.onDidChangeViewState(
+      (e) => {
+        if (this._panel.visible) {
+          this._update();
+        }
+      },
+      null,
+      this._disposables
+    );
+
+    // Handle messages from the webview
+    this._panel.webview.onDidReceiveMessage(this._messageListener, null, this._disposables);
+  }
+
   public static createOrShow(extensionUri: vscode.Uri) {
     const column = vscode.window.activeTextEditor
       ? vscode.window.activeTextEditor.viewColumn
@@ -22,7 +46,8 @@ export class WebAppPanel {
     }
 
     // Otherwise, create a new panel.
-    const title: string = vscode.workspace.getConfiguration().get("legado-vscode.panelTitle") || "阅读";
+    const title: string =
+      vscode.workspace.getConfiguration().get("legado-vscode.panelTitle") || "阅读";
     const panel = vscode.window.createWebviewPanel(
       WebAppPanel.viewType,
       title,
@@ -47,40 +72,6 @@ export class WebAppPanel {
     WebAppPanel.currentPanel = undefined;
   }
 
-  private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
-    this._panel = panel;
-    this._extensionUri = extensionUri;
-
-    // Set the webview's initial html content
-    this._update();
-
-    this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
-
-    // Update the content based on view changes
-    this._panel.onDidChangeViewState(
-      (e) => {
-        if (this._panel.visible) {
-          this._update();
-        }
-      },
-      null,
-      this._disposables
-    );
-
-    // Handle messages from the webview
-    this._panel.webview.onDidReceiveMessage(
-      (message) => {
-        switch (message.command) {
-          case "alert":
-            vscode.window.showErrorMessage(message.text);
-            return;
-        }
-      },
-      null,
-      this._disposables
-    );
-  }
-
   public dispose() {
     WebAppPanel.currentPanel = undefined;
 
@@ -95,6 +86,22 @@ export class WebAppPanel {
     }
   }
 
+  private _messageListener(message: any) {
+    switch (message.command) {
+      case "alert":
+        vscode.window.showErrorMessage(message.text);
+        return;
+      case "setConfiguration":
+        vscode.workspace
+          .getConfiguration()
+          .update(message.key, message.value, vscode.ConfigurationTarget.Global);
+        return;
+      case "reload":
+        WebAppPanel.currentPanel?._update();
+        return;
+    }
+  }
+
   private async _update() {
     const webview = this._panel.webview;
     this._panel.webview.html = this._getHtmlForWebview(webview);
@@ -102,7 +109,8 @@ export class WebAppPanel {
 
   private _getHtmlForWebview(webview: vscode.Webview) {
     const baseUri = getUri(webview, this._extensionUri, ["web", "dist"]).toString();
-    let webServeUrl: string = vscode.workspace.getConfiguration().get("legado-vscode.webServeUrl") || "";
+    let webServeUrl: string =
+      vscode.workspace.getConfiguration().get("legado-vscode.webServeUrl") || "";
     webServeUrl = webServeUrl.replace(/^\s+|[\/\s]+$/, "");
 
     return /*html*/ `
@@ -113,8 +121,7 @@ export class WebAppPanel {
           <link rel="icon" href="${baseUri}/favicon.ico" />
           <meta name="viewport" content="width=device-width,initial-scale=1.0" />
           <script type="text/javascript">
-            window.baseUri="${baseUri}";
-            window.legadoWebServeUrl="${webServeUrl}";
+            localStorage.setItem("legadoWebServeUrl", "${webServeUrl}");
           </script>
           <script type="module" crossorigin src="${baseUri}/assets/index.js"></script>
           <link rel="modulepreload" crossorigin href="${baseUri}/assets/vendor.js">

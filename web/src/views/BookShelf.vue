@@ -81,6 +81,7 @@ import githubUrl from "@/assets/imgs/github.png";
 import { useLoading } from "@/hooks/loading";
 import { Search } from "@element-plus/icons-vue";
 import API from "@api";
+import WEB from "@/api/web";
 
 const store = useBookStore();
 const { connectStatus, connectType, newConnect, shelf } = storeToRefs(store);
@@ -148,7 +149,68 @@ const searchBook = () => {
   );
 };
 
-const setIP = () => {};
+const setIP = () => {
+  ElMessageBox.prompt("请输入阅读WEB服务地址", "设置", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    inputValidator: (input) => {
+      let reg = /^https?:\/\/((?:\d{1,3}\.){3}(?:\d{1,3})):(\d{1,5})$/;
+      if (!reg.test(input)) {
+        return false;
+      }
+      let res = reg.exec(input);
+      let ips = res[1].split(".");
+      for (let i = 0; i < ips.length; i++) {
+        let ip = parseInt(ips[i]);
+        if (ip > 255) {
+          return false;
+        }
+      }
+      let port = parseInt(res[2]);
+      if (port > 65535) {
+        return false;
+      }
+      return true;
+    },
+    inputErrorMessage: "无效的地址",
+    closeOnClickModal: false,
+    beforeClose: (action, instance, done) => {
+      if (action !== "confirm") {
+        done();
+        return;
+      }
+      // store.setNewConnect(true);
+      instance.confirmButtonLoading = true;
+      instance.confirmButtonText = "正在连接";
+      WEB.checkLegadoWebServeUrl(instance.inputValue)
+        .then(() => {
+          // store.setConnectType("success");
+          // store.setConnectStatus("已连接 ");
+          // store.setNewConnect(false);
+          done();
+        })
+        .catch(() => {
+          instance.confirmButtonLoading = false;
+          instance.confirmButtonText = "确定";
+          // store.setConnectType("danger");
+          // store.setConnectStatus("连接失败");
+          // store.setNewConnect(false);
+          ElMessage.error(`${instance.inputValue} 连接失败`);
+        });
+    }
+  })
+    .then(({ value }) => {
+      WEB.setLegadoWebServeUrl(value);
+      ElMessage.success({
+        message: `${value} 连接成功，即将重新加载`,
+        duration: 1000,
+        onClose: () => {
+          WEB.reload();
+        }
+      });
+    })
+    .catch(() => {});
+};
 
 const router = useRouter();
 const handleBookClick = async (book) => {
