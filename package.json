@@ -48,7 +48,7 @@
         "legado-vscode.panelTitle": {
           "type": "string",
           "default": "阅读",
-          "description": "Tab页标题，默认阅读"
+          "description": "Tab页标题"
         },
         "legado-vscode.webServeUrl": {
           "type": "string",
@@ -63,11 +63,14 @@
     "web"
   ],
   "scripts": {
-    "build": "yarn --cwd web run build && vsce package",
+    "web:build": "yarn --cwd web run build",
+    "web:dev": "yarn --cwd web run dev",
+    "web:watch": "yarn --cwd web run watch",
+    "build": "yarn run web:build && vsce package",
     "vscode:prepublish": "yarn run package",
     "compile": "webpack",
     "watch": "webpack --watch",
-    "watch:all": "concurrently \"yarn --cwd web run watch\" \"yarn run watch\"",
+    "watch:all": "concurrently \"yarn run web:watch\" \"yarn run watch\"",
     "package": "webpack --mode production --devtool hidden-source-map",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
