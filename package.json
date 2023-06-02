@@ -37,12 +37,12 @@
     "commands": [
       {
         "command": "legado-vscode.openLegado",
-        "title": "打开阅读书架",
-        "category": "legado-vscode"
+        "title": "打开阅读APP书架",
+        "category": "阅读APP Legado"
       }
     ],
     "configuration": {
-      "title": "阅读插件",
+      "title": "阅读APP插件",
       "type": "object",
       "properties": {
         "legado-vscode.panelTitle": {
@@ -52,7 +52,7 @@
         },
         "legado-vscode.webServeUrl": {
           "type": "string",
-          "default": "http://192.168.104.62:1122",
+          "default": "http://127.0.0.1:1122",
           "description": "阅读APP的WEB服务访问地址"
         }
       }
