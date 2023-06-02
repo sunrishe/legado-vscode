@@ -4,7 +4,7 @@
 
 格式是基于[Keep a Changelog](https://keepachangelog.com/en/1.0.0/)，这个项目坚持[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [未发布]
+## [1.1.3] - 2023-06-02
 
 ### 新增
 
