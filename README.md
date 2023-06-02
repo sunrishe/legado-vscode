@@ -1,13 +1,19 @@
 # 阅读VS Code插件
 
-![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/sunrishe.legado-vscode) ![Visual Studio Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/sunrishe.legado-vscode) ![Visual Studio Marketplace Installs](https://img.shields.io/visual-studio-marketplace/i/sunrishe.legado-vscode)![stars](https://img.shields.io/github/stars/sunrishe/legado-vscode) ![forks](https://img.shields.io/github/forks/sunrishe/legado-vscode) ![issues](https://img.shields.io/github/issues/sunrishe/legado-vscode) ![issues](https://img.shields.io/github/issues-closed/sunrishe/legado-vscode?color=%2347BB22)
+![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/sunrishe.legado-vscode)
+![Visual Studio Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/sunrishe.legado-vscode)
+![Visual Studio Marketplace Installs](https://img.shields.io/visual-studio-marketplace/i/sunrishe.legado-vscode)
+![stars](https://img.shields.io/github/stars/sunrishe/legado-vscode)
+![forks](https://img.shields.io/github/forks/sunrishe/legado-vscode)
+![issues](https://img.shields.io/github/issues/sunrishe/legado-vscode)
+![issues](https://img.shields.io/github/issues-closed/sunrishe/legado-vscode?color=%235865f2)
 
 > 配合[阅读APP](https://github.com/gedoor/legado.git)用来摸鱼或学习的小说阅读插件。
 
 - 📕 仓库地址: [github.com](https://github.com/sunrishe/legado-vscode)
 - 📗 插件地址: [marketplace.visualstudio.com](https://marketplace.visualstudio.com/items?itemName=sunrishe.legado-vscode)
 - 📘 更新日志: [CHANGELOG](https://github.com/sunrishe/legado-vscode/blob/master/CHANGELOG.md)
-- 📙 插件不断完善, 欢迎提交 [issues](https://github.com/sunrishe/legado-vscode/issues)、[pr](https://github.com/sunrishe/legado-vscode/pulls)、[star](https://github.com/sunrishe/legado-vscode)
+- 📙 插件不断完善，欢迎提交 [issues](https://github.com/sunrishe/legado-vscode/issues)、[pr](https://github.com/sunrishe/legado-vscode/pulls)、[star](https://github.com/sunrishe/legado-vscode)
 
 ---
 
@@ -17,11 +23,13 @@
 
 ## 使用帮助
 
-1. 在阅读APP中打开`我的 > Web服务`启用Web服务。
-2. 电脑和手机处于同一局域网内。
-3. 在VS Code中搜索插件并安装。
-4. VS Code设置中配置`阅读APP的WEB服务访问地址`。
-5. VS Code搜索命令`打开阅读书架`并执行。
+1. 在阅读APP中打开`我的 > Web服务`启用Web服务
+2. 电脑和手机处于同一局域网内
+3. 在VS Code中搜索插件并安装
+4. VS Code搜索命令`阅读APP Legado: 打开阅读APP书架`并执行
+5. 点击`基本设定下的状态栏`，在弹框中输入阅读APP的WEB服务访问地址
+6. 测试成功后自动配置，同步修改VS Code设置`legado-vscode.webServeUrl`阅读APP的WEB服务访问地址的配置信息
+7. 页面自动刷新，配置生效
 
 ### 启用暗黑模式
 
