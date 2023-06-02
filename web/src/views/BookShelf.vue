@@ -153,6 +153,7 @@ const setIP = () => {
   ElMessageBox.prompt("请输入阅读WEB服务地址", "设置", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
+    inputValue: WEB.getLegadoWebServeUrl(),
     inputValidator: (input) => {
       let reg = /^https?:\/\/((?:\d{1,3}\.){3}(?:\d{1,3})):(\d{1,5})$/;
       if (!reg.test(input)) {
