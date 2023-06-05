@@ -406,6 +406,10 @@ const onReachBottom = (entries) => {
 // 监听方向键
 const handleKeyPress = (event) => {
   switch (event.key) {
+    case "Q":
+    case "q":
+      toShelf();
+      break;
     case "ArrowLeft":
     case "A":
     case "a":
