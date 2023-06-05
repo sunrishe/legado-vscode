@@ -367,10 +367,6 @@ const fetchBookShelfData = () => {
         font-family: FZZCYSK;
       }
 
-      .no-point {
-        pointer-events: none;
-      }
-
       .setting-connect {
         font-size: 8px;
         margin-top: 16px;
