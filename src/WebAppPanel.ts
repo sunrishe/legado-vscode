@@ -35,9 +35,9 @@ export class WebAppPanel {
   }
 
   public static createOrShow(extensionUri: vscode.Uri) {
-    const column = vscode.window.activeTextEditor
+    const column = (vscode.window.activeTextEditor
       ? vscode.window.activeTextEditor.viewColumn
-      : undefined;
+      : undefined) || vscode.ViewColumn.One;
 
     // If we already have a panel, show it.
     if (WebAppPanel.currentPanel) {
@@ -51,7 +51,7 @@ export class WebAppPanel {
     const panel = vscode.window.createWebviewPanel(
       WebAppPanel.viewType,
       title,
-      column || vscode.ViewColumn.One,
+      column,
       // Extra panel configurations
       {
         // Enable javascript in the webview
