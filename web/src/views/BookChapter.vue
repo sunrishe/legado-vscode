@@ -483,7 +483,7 @@ const handleKeyPress = (event) => {
           type: "warn",
         });
       } else {
-        jump(0 - document.documentElement.clientHeight + 100, { duration: 100 });
+        jump(0 - document.documentElement.clientHeight + 50, { duration: 100 });
       }
       break;
     case "ArrowDown":
@@ -501,11 +501,8 @@ const handleKeyPress = (event) => {
           type: "warn",
         });
       } else {
-        jump(document.documentElement.clientHeight - 100, { duration: 100 });
+        jump(document.documentElement.clientHeight - 50, { duration: 100 });
       }
-      break;
-    default:
-      console.log(event.key);
       break;
   }
 };
