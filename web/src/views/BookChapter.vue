@@ -110,6 +110,7 @@
 import jump from "@/plugins/jump";
 import settings from "@/config/themeConfig";
 import API from "@api";
+import WEB from "@/api/web";
 import { useLoading } from "@/hooks/loading";
 
 const content = ref();
@@ -423,7 +424,7 @@ watchEffect(() => {
   }
 });
 const loadMore = () => {
-  let index = chapterData.value.slice(-1)[0].index;
+  let index = chapterData.value.slice(-1)[0]?.index;
   if (catalog.value.length - 1 > index) {
     getContent(index + 1, false);
   }
@@ -434,6 +435,27 @@ const onReachBottom = (entries) => {
   for (let { isIntersecting } of entries) {
     if (!isIntersecting) return;
     loadMore();
+  }
+};
+// 绑定加载更多的观察者
+let reobserveLoadingHandler;
+const reobserveLoading = (force = false) => {
+  // 使用cancelAnimationFrame避免resize时计算量过大浏览器卡死的情况
+  if (reobserveLoadingHandler) {
+    window.cancelAnimationFrame(reobserveLoadingHandler);
+  }
+  // 当已经绑定过加载更多或者强制的情况下才绑定，避免未连接到后端时错误的执行加载更多
+  if (scrollObserver || force) {
+    reobserveLoadingHandler = window.requestAnimationFrame(() => {
+      // 已有观察则先取消
+      scrollObserver?.disconnect();
+      scrollObserver = new IntersectionObserver(onReachBottom, {
+        // 解决vscode下rootMargin无效的问题
+        root: WEB.isVscode() ? document : null,
+        rootMargin: `-100% 0% 120%`,
+      });
+      infiniteLoading.value && scrollObserver.observe(loading.value);
+    });
   }
 };
 
@@ -530,6 +552,7 @@ onMounted(() => {
   }
   onResize();
   window.addEventListener("resize", onResize);
+  // window.addEventListener("resize", () => reobserveLoading());
   loadingWrapper(
     API.getChapterList(bookUrl).then(
       (res) => {
@@ -546,11 +569,8 @@ onMounted(() => {
         window.addEventListener("keyup", handleKeyPress);
         // 兼容Safari < 14
         document.addEventListener("visibilitychange", onVisibilityChange);
-        //监听底部加载
-        scrollObserver = new IntersectionObserver(onReachBottom, {
-          rootMargin: "-100% 0% 20% 0%",
-        });
-        infiniteLoading.value && scrollObserver.observe(loading.value);
+        // 监听底部加载，首次强制绑定
+        reobserveLoading(true);
         //第二次点击同一本书 页面标题不会变化
         document.title = null;
         document.title = bookName + " | " + catalog.value[chapterIndex].title;
