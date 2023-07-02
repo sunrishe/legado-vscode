@@ -3,6 +3,8 @@ import axios from "axios";
 // @ts-ignore
 const vscode = typeof acquireVsCodeApi === "function" ? acquireVsCodeApi() : undefined;
 
+const isVscode = () => !!vscode;
+
 const getLegadoWebServeUrl = () => {
   let legadoWebServeUrl = localStorage.getItem("legadoWebServeUrl");
   return legadoWebServeUrl || import.meta.env.VITE_API || location.origin;
@@ -39,6 +41,7 @@ const reload = () => {
 };
 
 export default {
+  isVscode,
   getLegadoWebServeUrl,
   setLegadoWebServeUrl,
   checkLegadoWebServeUrl,
