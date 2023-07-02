@@ -259,6 +259,8 @@ const getContent = (index, reloadChapter = true, chapterPos = 0) => {
     jump(top.value, { duration: 0 });
     //从目录，按钮切换章节时保存进度 预加载时不保存
     saveReadingBookProgressToBrowser(index, chapterPos);
+    //加载新章节内容时，强制保存阅读进度到APP
+    saveReadingBookProgressToApp(true);
     chapterData.value = [];
   }
   let bookUrl = sessionStorage.getItem("bookUrl");
@@ -306,6 +308,7 @@ const toChapterPos = (pos) => {
 };
 const onReadedLengthChange = (index, pos) => {
   saveReadingBookProgressToBrowser(index, pos);
+  saveReadingBookProgressToApp();
 };
 
 // 文档标题
@@ -334,6 +337,33 @@ const saveReadingBookProgressToBrowser = (index, pos) => {
   sessionStorage.setItem("chapterPos", String(pos));
 };
 
+// 阅读记录保存到APP
+const lastSaveToAppTime = ref(0);
+const lastBookProgress = ref(null);
+const saveReadingBookProgressToApp = (force = false) => {
+  let current = new Date().getTime();
+  let pastTime = current - lastSaveToAppTime.value;
+  if (force || pastTime >= 3000) {
+    // 比对与最后一次保存时的状态是否一致
+    let lbp = lastBookProgress.value || {};
+    let cbp = bookProgress.value;
+    let equals =
+      lbp.name === cbp.name &&
+      lbp.author === cbp.author &&
+      lbp.durChapterIndex === cbp.durChapterIndex &&
+      lbp.durChapterPos === cbp.durChapterPos &&
+      lbp.durChapterTitle === cbp.durChapterTitle;
+    if (!equals) {
+      lastSaveToAppTime.value = current;
+      lastBookProgress.value = cbp;
+      API.saveBookProgress(bookProgress.value);
+    }
+  }
+};
+
+// 定时同步阅读进度到APP
+const saveRBPToAppId = setInterval(saveReadingBookProgressToApp, 10_000);
+
 // 进度同步
 // 返回导航变化 同步请求会在获取书架前完成
 
@@ -347,7 +377,6 @@ const onVisibilityChange = () => {
     API.saveBookProgressWithBeacon(bookProgress.value);
   }
 };
-// 定时同步
 
 // 章节切换
 const toNextChapter = () => {
@@ -538,6 +567,8 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  // 清除定时保存阅读记录的定时任务
+  clearInterval(saveRBPToAppId);
   window.removeEventListener("keyup", handleKeyPress);
   window.removeEventListener("resize", onResize);
   // 兼容Safari < 14
