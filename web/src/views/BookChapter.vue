@@ -243,6 +243,11 @@ const toShelf = () => {
   router.push("/");
 };
 
+// 目录切换
+const popCataTogger = () => {
+  popCataVisible.value = !popCataVisible.value;
+};
+
 // 获取章节内容
 const chapterData = ref([]);
 const noPoint = ref(true);
@@ -408,7 +413,21 @@ const handleKeyPress = (event) => {
   switch (event.key) {
     case "Q":
     case "q":
+      event.stopPropagation();
+      event.preventDefault();
       toShelf();
+      break;
+    case "E":
+    case "e":
+      event.stopPropagation();
+      event.preventDefault();
+      popCataTogger();
+      break;
+    case "R":
+    case "r":
+      event.stopPropagation();
+      event.preventDefault();
+      getContent(chapterIndex.value);
       break;
     case "ArrowLeft":
     case "A":
