@@ -149,6 +149,8 @@ const theme = computed(() => config.value.theme);
 const infiniteLoading = computed(() => config.value.infiniteLoading);
 
 // 字体
+const fontColor = computed(() => config.value.fontColor);
+const fontColorRef = toRef(fontColor);
 const fontFamily = computed(() => {
   if (store.config.font >= 0) {
     return settings.fonts[store.config.font];
@@ -721,7 +723,8 @@ onUnmounted(() => {
 
   :deep(.chapter) {
     border: 1px solid #d8d8d8;
-    color: #262626;
+    // color: #262626;
+    color: v-bind(fontColorRef);
   }
 }
 
@@ -742,7 +745,8 @@ onUnmounted(() => {
 
   :deep(.chapter) {
     border: 1px solid #444;
-    color: #666;
+    // color: #666;
+    color: v-bind(fontColorRef);
   }
 
   :deep(.popper__arrow) {

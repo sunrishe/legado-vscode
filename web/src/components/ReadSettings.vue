@@ -22,6 +22,17 @@
           >
         </li>
         <li class="font-list">
+          <i>字体颜色</i>
+          <el-color-picker
+            v-model="fontColor"
+            size="default"
+            color-format="hex"
+            :validate-event="false"
+            @change="saveFontColor"
+            @active-change="changeFontColor"
+          />
+        </li>
+        <li class="font-list">
           <i>正文字体</i>
           <span
             class="font-item"
@@ -232,10 +243,12 @@ const setTheme = (theme) => {
   if (theme == 6) {
     isNight.value = true;
     moonIcon.value = "";
+    fontColor.value = config.value.fontColor = "#666";
     moonIconStyle.value.color = "#ed4259";
   } else {
     isNight.value = false;
     moonIcon.value = "";
+    fontColor.value = config.value.fontColor = "#262626";
     moonIconStyle.value.color = "rgba(255,255,255,0.2)";
   }
   config.value.theme = theme;
@@ -249,6 +262,23 @@ const setCustomFont = () => {
   config.value.font = -1;
   config.value.customFontName = customFontName.value;
   saveConfig(config.value);
+};
+
+const fontColor = ref(config.value.fontColor);
+const saveFontColor = (color) => {
+  if (!color) {
+    color = config.value.theme == 6 ? "#666" : "#262626";
+  }
+  fontColor.value = config.value.fontColor = color;
+  saveConfig(config.value);
+};
+const changeFontColor = (color) => {
+  if (color) {
+    config.value.fontColor = color;
+  } else {
+    // 为空则是最后一次改变，需保存最后一次选择的颜色
+    saveConfig(config.value);
+  }
 };
 
 const fontSize = computed(() => {

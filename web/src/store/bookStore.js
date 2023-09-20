@@ -19,6 +19,7 @@ export const useBookStore = defineStore("book", {
         theme: 0,
         font: 0,
         fontSize: 18,
+        fontColor: "#262626",
         readWidth: 800,
         infiniteLoading: false,
         customFontName: "",
