@@ -4,6 +4,12 @@
 
 格式是基于[Keep a Changelog](https://keepachangelog.com/en/1.0.0/)，这个项目坚持[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] - 2023-09-20
+
+### 新增
+
+- 阅读页面：支持自定义字体颜色
+
 ## [1.3.4] - 2023-07-02
 
 ### 新增

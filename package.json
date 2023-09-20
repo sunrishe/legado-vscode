@@ -1,7 +1,7 @@
 {
   "name": "legado-vscode",
   "displayName": "阅读APP",
-  "description": "配合阅读APP用来学习的阅读插件。",
+  "description": "配合阅读APP用来学习或摸鱼的小说阅读插件。",
   "keywords": [
     "legado",
     "阅读",
@@ -13,7 +13,7 @@
   ],
   "publisher": "sunrishe",
   "license": "GPL-3.0",
-  "version": "1.3.4",
+  "version": "1.4.1",
   "icon": "public/ic_launcher.png",
   "qna": "https://github.com/sunrishe/legado-vscode/issues",
   "bugs": {
