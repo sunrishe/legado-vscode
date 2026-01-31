@@ -54,10 +54,7 @@
         </div>
       </div>
       <div class="bottom-icons">
-        <a
-          href="https://github.com/gedoor/legado_web_bookshelf"
-          target="_blank"
-        >
+        <a href="https://github.com/gedoor/legado_web_bookshelf" target="_blank">
           <div class="bottom-icon">
             <img :src="githubUrl" alt="" />
           </div>
@@ -65,11 +62,7 @@
       </div>
     </div>
     <div class="shelf-wrapper" ref="shelfWrapper">
-      <book-items
-        :books="books"
-        @bookClick="handleBookClick"
-        :isSearch="isSearching"
-      ></book-items>
+      <book-items :books="books" @bookClick="handleBookClick" :isSearch="isSearching"></book-items>
     </div>
   </div>
 </template>
@@ -96,13 +89,10 @@ const readingRecent = ref({
   author: "",
   url: "",
   chapterIndex: 0,
-  chapterPos: 0,
+  chapterPos: 0
 });
 const shelfWrapper = ref(null);
-const { showLoading, closeLoading, loadingWrapper } = useLoading(
-  shelfWrapper,
-  "正在获取书籍信息"
-);
+const { showLoading, closeLoading, loadingWrapper } = useLoading(shelfWrapper, "正在获取书籍信息");
 
 const books = ref([]);
 
@@ -117,9 +107,7 @@ watchEffect(() => {
     return;
   }
   books.value = shelf.value.filter((book) => {
-    return (
-      book.name.includes(search.value) || book.author.includes(search.value)
-    );
+    return book.name.includes(search.value) || book.author.includes(search.value);
   });
 });
 
@@ -215,13 +203,7 @@ const setIP = () => {
 
 const router = useRouter();
 const handleBookClick = async (book) => {
-  const {
-    bookUrl,
-    name,
-    author,
-    durChapterIndex = 0,
-    durChapterPos = 0,
-  } = book;
+  const { bookUrl, name, author, durChapterIndex = 0, durChapterPos = 0 } = book;
   await API.saveBook(book);
   toDetail(bookUrl, name, author, durChapterIndex, durChapterPos);
 };
@@ -237,11 +219,11 @@ const toDetail = (bookUrl, bookName, bookAuthor, chapterIndex, chapterPos) => {
     author: bookAuthor,
     url: bookUrl,
     chapterIndex: chapterIndex,
-    chapterPos: chapterPos,
+    chapterPos: chapterPos
   };
   localStorage.setItem("readingRecent", JSON.stringify(readingRecent.value));
   router.push({
-    path: "/chapter",
+    path: "/chapter"
   });
 };
 
@@ -267,13 +249,44 @@ const fetchBookShelfData = () => {
       store.setConnectType("success");
       if (response.data.isSuccess) {
         //store.increaseBookNum(response.data.data.length);
-        store.addBooks(
-          response.data.data.sort(function (a, b) {
-            var x = a["durChapterTime"] || 0;
-            var y = b["durChapterTime"] || 0;
-            return y - x;
-          })
-        );
+        const sortedBooks = response.data.data.sort(function (a, b) {
+          var x = a["durChapterTime"] || 0;
+          var y = b["durChapterTime"] || 0;
+          return y - x;
+        });
+        store.addBooks(sortedBooks);
+
+        // 更新最近阅读 - 从服务器数据中获取最新的阅读记录
+        if (sortedBooks.length > 0) {
+          // 找到最近阅读的书（按阅读时间排序）
+          const latestBook = sortedBooks.find((book) => book.durChapterTime) || sortedBooks[0];
+
+          // 如果有正在阅读的记录或者最近阅读的书存在，则更新
+          if (latestBook && (latestBook.durChapterTime || readingRecent.value.url)) {
+            // 检查是否是同一本书，如果是则更新进度；如果不是则以服务器数据为准
+            const isSameBook = latestBook.bookUrl === readingRecent.value.url;
+
+            readingRecent.value = {
+              name: latestBook.name || "尚无阅读记录",
+              author: latestBook.author || "",
+              url: latestBook.bookUrl || "",
+              chapterIndex: latestBook.durChapterIndex || 0,
+              chapterPos: latestBook.durChapterPos || 0
+            };
+
+            // 如果是同一本书且服务器进度更新，则使用服务器数据
+            // 如果不是同一本书，则直接使用服务器数据（最近阅读的书）
+            if (isSameBook) {
+              // 保持服务器的最新进度
+              console.log(`同步阅读进度：${latestBook.name} - 第${latestBook.durChapterIndex}章`);
+            } else if (latestBook.bookUrl) {
+              console.log(`切换最近阅读：${latestBook.name} - 第${latestBook.durChapterIndex}章`);
+            }
+
+            // 更新 localStorage 以保持一致性
+            localStorage.setItem("readingRecent", JSON.stringify(readingRecent.value));
+          }
+        }
       } else {
         ElMessage.error(response.data.errorMsg);
       }
@@ -400,34 +413,42 @@ const fetchBookShelfData = () => {
   .index-wrapper {
     overflow-x: hidden;
     flex-direction: column;
+
     .navigation-wrapper {
       padding: 20px 24px;
       box-sizing: border-box;
       width: 100%;
+
       .navigation-title-wrapper {
         white-space: nowrap;
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
       }
+
       .bottom-wrapper {
         flex-direction: row;
+
         > * {
           flex-grow: 1;
           margin-top: 18px;
+
           .reading-recent,
           .setting-item {
             margin-bottom: 0px;
           }
         }
       }
+
       .bottom-icons {
         display: none;
       }
     }
+
     .shelf-wrapper {
       padding: 0;
       flex-grow: 1;
+
       :deep(.el-loading-spinner) {
         display: none;
       }
@@ -438,20 +459,24 @@ const fetchBookShelfData = () => {
 .night {
   :deep(.navigation-wrapper) {
     background-color: #454545;
+
     .navigation-title {
       color: #aeaeae;
     }
+
     .search-wrapper {
       .search-input {
         .el-input__wrapper {
           background-color: #454545;
         }
+
         .el-input__inner {
           color: #b1b1b1;
         }
       }
     }
   }
+
   :deep(.shelf-wrapper) {
     background-color: #161819;
   }

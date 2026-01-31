@@ -8,12 +8,12 @@
   >
     <img
       class="full"
-      v-if="/^\s*<img[^>]*src[^>]+>$/.test(para)"
+      v-if="showImages && /^\s*<img[^>]*src[^>]+>$/.test(para)"
       :src="getImageSrc(para)"
       @error.once="proxyImage"
       loading="lazy"
     />
-    <p v-else :style="{ fontFamily, fontSize }" v-html="para" />
+    <p v-else :style="{ fontFamily, fontSize }" v-html="filterImages(para)" />
   </div>
 </template>
 
@@ -28,6 +28,7 @@ const props = defineProps({
   spacing: { type: Object, required: true },
   fontFamily: { type: String, required: true },
   fontSize: { type: String, required: true },
+  showImages: { type: Boolean, default: true }
 });
 
 const getImageSrc = (content) => {
@@ -38,6 +39,11 @@ const getImageSrc = (content) => {
 };
 const proxyImage = (event) => {
   event.target.src = getImageFromLegado(event.target.src);
+};
+
+const filterImages = (content) => {
+  if (props.showImages) return content;
+  return content.replace(/<img[^>]*>/g, "");
 };
 
 const calculateWordCount = (paragraph) => {
@@ -58,18 +64,16 @@ const titleRef = ref();
 const paragraphRef = ref();
 const scrollToReadedLength = (length) => {
   if (length === 0) return;
-  let paragraphIndex = chapterPos.value.findIndex(
-    (wordCount) => wordCount >= length
-  );
+  let paragraphIndex = chapterPos.value.findIndex((wordCount) => wordCount >= length);
   if (paragraphIndex === -1) return;
   nextTick(() => {
     jump(paragraphRef.value[paragraphIndex], {
-      duration: 0,
+      duration: 0
     });
   });
 };
 defineExpose({
-  scrollToReadedLength,
+  scrollToReadedLength
 });
 let intersectionObserver = null;
 const emit = defineEmits(["readedLengthChange"]);
@@ -78,16 +82,12 @@ onMounted(() => {
     (entries) => {
       for (let { target, isIntersecting } of entries) {
         if (isIntersecting) {
-          emit(
-            "readedLengthChange",
-            props.chapterIndex,
-            parseInt(target.dataset.chapterpos)
-          );
+          emit("readedLengthChange", props.chapterIndex, parseInt(target.dataset.chapterpos));
         }
       }
     },
     {
-      rootMargin: `0px 0px -${window.innerHeight - 24}px 0px`,
+      rootMargin: `0px 0px -${window.innerHeight - 24}px 0px`
     }
   );
   intersectionObserver.observe(titleRef.value);
@@ -105,8 +105,8 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 .title {
   margin-bottom: 57px;
-  font: 24px / 32px PingFangSC-Regular, HelveticaNeue-Light,
-    "Helvetica Neue Light", "Microsoft YaHei", sans-serif;
+  font: 24px / 32px PingFangSC-Regular, HelveticaNeue-Light, "Helvetica Neue Light",
+    "Microsoft YaHei", sans-serif;
 }
 
 p {
@@ -119,7 +119,8 @@ p {
   margin: calc(v-bind("props.spacing.paragraph") * 1em) 0;
 
   :deep(img) {
-    height: 1em;
+    display: v-bind("props.showImages ? 'inline' : 'none'");
+    height: v-bind("props.showImages ? '1em' : '0'");
   }
 }
 

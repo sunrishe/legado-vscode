@@ -6,7 +6,7 @@ const router = createRouter({
   //   history: createWebHistory(process.env.BASE_URL),
   history: createWebHashHistory(),
   // @ts-ignore
-  routes: bookRoutes.concat(sourceRoutes),
+  routes: bookRoutes.concat(sourceRoutes)
 });
 
 router.afterEach((to) => {

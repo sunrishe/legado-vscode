@@ -47,11 +47,7 @@
           <div class="iconfont">&#58914;</div>
           <div class="icon-text">顶部</div>
         </div>
-        <div
-          class="tool-icon"
-          :class="{ 'no-point': noPoint }"
-          @click="toBottom"
-        >
+        <div class="tool-icon" :class="{ 'no-point': noPoint }" @click="toBottom">
           <div class="iconfont">&#58915;</div>
           <div class="icon-text">底部</div>
         </div>
@@ -59,19 +55,11 @@
     </div>
     <div class="read-bar" :style="rightBarTheme">
       <div class="tools">
-        <div
-          class="tool-icon"
-          :class="{ 'no-point': noPoint }"
-          @click="toPreChapter"
-        >
+        <div class="tool-icon" :class="{ 'no-point': noPoint }" @click="toPreChapter">
           <div class="iconfont">&#58920;</div>
           <span v-if="miniInterface">上一章</span>
         </div>
-        <div
-          class="tool-icon"
-          :class="{ 'no-point': noPoint }"
-          @click="toNextChapter"
-        >
+        <div class="tool-icon" :class="{ 'no-point': noPoint }" @click="toNextChapter">
           <span v-if="miniInterface">下一章</span>
           <div class="iconfont">&#58913;</div>
         </div>
@@ -81,12 +69,7 @@
     <div class="chapter" ref="content" :style="chapterTheme">
       <div class="content">
         <div class="top-bar" ref="top"></div>
-        <div
-          v-for="data in chapterData"
-          :key="data.index"
-          :chapterIndex="data.index"
-          ref="chapter"
-        >
+        <div v-for="data in chapterData" :key="data.index" :chapterIndex="data.index" ref="chapter">
           <chapter-content
             ref="chapterRef"
             :chapterIndex="data.index"
@@ -95,6 +78,7 @@
             :spacing="store.config.spacing"
             :fontSize="fontSize"
             :fontFamily="fontFamily"
+            :showImages="store.config.showImages"
             @readedLengthChange="onReadedLengthChange"
             v-if="showContent"
           />
@@ -134,15 +118,15 @@ const {
   showContent,
   config,
   readingBook,
-  bookProgress,
+  bookProgress
 } = storeToRefs(store);
 const chapterPos = computed({
   get: () => readingBook.value.chapterPos,
-  set: (value) => (readingBook.value.chapterPos = value),
+  set: (value) => (readingBook.value.chapterPos = value)
 });
 const chapterIndex = computed({
   get: () => readingBook.value.index,
-  set: (value) => (readingBook.value.index = value),
+  set: (value) => (readingBook.value.index = value)
 });
 
 const theme = computed(() => config.value.theme);
@@ -182,32 +166,28 @@ const popupWidth = computed(() => {
 });
 const bodyTheme = computed(() => {
   return {
-    background: bodyColor.value,
+    background: bodyColor.value
   };
 });
 const chapterTheme = computed(() => {
   return {
     background: chapterColor.value,
-    width: readWidth.value,
+    width: readWidth.value
   };
 });
 const showToolBar = ref(false);
 const leftBarTheme = computed(() => {
   return {
     background: popupColor.value,
-    marginLeft: miniInterface.value
-      ? 0
-      : -(store.config.readWidth / 2 + 68) + "px",
-    display: miniInterface.value && !showToolBar.value ? "none" : "block",
+    marginLeft: miniInterface.value ? 0 : -(store.config.readWidth / 2 + 68) + "px",
+    display: miniInterface.value && !showToolBar.value ? "none" : "block"
   };
 });
 const rightBarTheme = computed(() => {
   return {
     background: popupColor.value,
-    marginRight: miniInterface.value
-      ? 0
-      : -(store.config.readWidth / 2 + 52) + "px",
-    display: miniInterface.value && !showToolBar.value ? "none" : "block",
+    marginRight: miniInterface.value ? 0 : -(store.config.readWidth / 2 + 52) + "px",
+    display: miniInterface.value && !showToolBar.value ? "none" : "block"
   };
 });
 const isNight = computed(() => theme.value == 6);
@@ -305,8 +285,7 @@ const chapter = ref();
 const chapterRef = ref();
 const toChapterPos = (pos) => {
   nextTick(() => {
-    if (chapterRef.value.length === 1)
-      chapterRef.value[0].scrollToReadedLength(pos);
+    if (chapterRef.value.length === 1) chapterRef.value[0].scrollToReadedLength(pos);
   });
 };
 const onReadedLengthChange = (index, pos) => {
@@ -388,13 +367,13 @@ const toNextChapter = () => {
   if (typeof catalog.value[index] !== "undefined") {
     ElMessage({
       message: "下一章",
-      type: "info",
+      type: "info"
     });
     getContent(index);
   } else {
     ElMessage({
       message: "本章是最后一章",
-      type: "error",
+      type: "error"
     });
   }
 };
@@ -404,13 +383,13 @@ const toPreChapter = () => {
   if (typeof catalog.value[index] !== "undefined") {
     ElMessage({
       message: "上一章",
-      type: "info",
+      type: "info"
     });
     getContent(index);
   } else {
     ElMessage({
       message: "本章是第一章",
-      type: "error",
+      type: "error"
     });
   }
 };
@@ -454,7 +433,7 @@ const reobserveLoading = (force = false) => {
       scrollObserver = new IntersectionObserver(onReachBottom, {
         // 解决vscode下rootMargin无效的问题
         root: WEB.isVscode() ? document : null,
-        rootMargin: `-100% 0% 120%`,
+        rootMargin: `-100% 0% 120%`
       });
       infiniteLoading.value && scrollObserver.observe(loading.value);
     });
@@ -504,7 +483,7 @@ const handleKeyPress = (event) => {
       if (document.documentElement.scrollTop === 0) {
         ElMessage({
           message: "已到达页面顶部",
-          type: "warn",
+          type: "warn"
         });
       } else {
         jump(0 - document.documentElement.clientHeight + 50, { duration: 100 });
@@ -516,13 +495,12 @@ const handleKeyPress = (event) => {
       event.stopPropagation();
       event.preventDefault();
       if (
-        document.documentElement.clientHeight +
-          document.documentElement.scrollTop ===
+        document.documentElement.clientHeight + document.documentElement.scrollTop ===
         document.documentElement.scrollHeight
       ) {
         ElMessage({
           message: "已到达页面底部",
-          type: "warn",
+          type: "warn"
         });
       } else {
         jump(document.documentElement.clientHeight - 50, { duration: 100 });
@@ -538,17 +516,13 @@ onMounted(() => {
   let chapterIndex = Number(sessionStorage.getItem("chapterIndex") || 0);
   let chapterPos = Number(sessionStorage.getItem("chapterPos") || 0);
   var book = JSON.parse(localStorage.getItem(bookUrl));
-  if (
-    book == null ||
-    chapterIndex != book.index ||
-    chapterPos != book.chapterPos
-  ) {
+  if (book == null || chapterIndex != book.index || chapterPos != book.chapterPos) {
     book = {
       bookName: bookName,
       bookAuthor: bookAuthor,
       bookUrl: bookUrl,
       index: chapterIndex,
-      chapterPos: chapterPos,
+      chapterPos: chapterPos
     };
     localStorage.setItem(bookUrl, JSON.stringify(book));
   }
@@ -684,8 +658,8 @@ onUnmounted(() => {
   }
 
   .chapter {
-    font-family: "Microsoft YaHei", PingFangSC-Regular, HelveticaNeue-Light,
-      "Helvetica Neue Light", sans-serif;
+    font-family: "Microsoft YaHei", PingFangSC-Regular, HelveticaNeue-Light, "Helvetica Neue Light",
+      sans-serif;
     text-align: left;
     padding: 0 65px;
     min-height: 100vh;

@@ -1,17 +1,8 @@
 <template>
-  <el-input
-    v-model="searchKey"
-    class="search"
-    :prefix-icon="Search"
-    placeholder="筛选源"
-  />
+  <el-input v-model="searchKey" class="search" :prefix-icon="Search" placeholder="筛选源" />
   <div class="tool">
     <el-button @click="importSourceFile" :icon="Folder">打开</el-button>
-    <el-button
-      :disabled="sourcesFiltered.length === 0"
-      @click="outExport"
-      :icon="Download"
-    >
+    <el-button :disabled="sourcesFiltered.length === 0" @click="outExport" :icon="Download">
       导出</el-button
     >
     <el-button
@@ -43,11 +34,7 @@
 <script setup>
 import API from "@api";
 import { Folder, Delete, Download, Search } from "@element-plus/icons-vue";
-import {
-  isSourceMatches,
-  getSourceUniqueKey,
-  convertSourcesToMap,
-} from "@utils/souce";
+import { isSourceMatches, getSourceUniqueKey, convertSourcesToMap } from "@utils/souce";
 import VirtualList from "vue3-virtual-scroll-list";
 import SourceItem from "./SourceItem.vue";
 
@@ -73,9 +60,7 @@ const sourceSelect = computed(() => {
   const urls = sourceUrlSelect.value;
   if (urls.length == 0) return [];
   const sourcesFilteredMap =
-    searchKey.value == ""
-      ? sourcesMap.value
-      : convertSourcesToMap(sourcesFiltered.value);
+    searchKey.value == "" ? sourcesMap.value : convertSourcesToMap(sourcesFiltered.value);
   return urls.reduce((sources, sourceUrl) => {
     const source = sourcesFilteredMap.get(sourceUrl);
     if (source) sources.push(source);
@@ -119,7 +104,7 @@ const importSourceFile = () => {
       } catch {
         ElMessage({
           message: "上传的源格式错误",
-          type: "error",
+          type: "error"
         });
       }
     };
@@ -130,10 +115,7 @@ const importSourceFile = () => {
 const isBookSource = /bookSource/.test(window.location.href);
 const outExport = () => {
   const exportFile = document.createElement("a");
-  let sources =
-      sourceUrlSelect.value.length === 0
-        ? sourcesFiltered.value
-        : sourceSelect.value,
+  let sources = sourceUrlSelect.value.length === 0 ? sourcesFiltered.value : sourceSelect.value,
     sourceType = isBookSource ? "BookSource" : "RssSource";
 
   exportFile.download = `${sourceType}_${Date()
@@ -141,7 +123,7 @@ const outExport = () => {
     .replace(/:/g, "")}.json`;
 
   let myBlob = new Blob([JSON.stringify(sources, null, 4)], {
-    type: "application/json",
+    type: "application/json"
   });
   exportFile.href = window.URL.createObjectURL(myBlob);
   exportFile.click();

@@ -1,12 +1,7 @@
 <template>
   <div class="books-wrapper">
     <div class="wrapper">
-      <div
-        class="book"
-        v-for="book in books"
-        :key="book.bookUrl"
-        @click="handleClick(book)"
-      >
+      <div class="book" v-for="book in books" :key="book.bookUrl" @click="handleClick(book)">
         <div class="cover-img">
           <img
             class="cover"
@@ -23,10 +18,7 @@
               {{ book.author }}
             </div>
             <div class="tags" v-if="isSearch">
-              <el-tag
-                v-for="tag in book.kind?.split(',').slice(0, 2)"
-                :key="tag"
-              >
+              <el-tag v-for="tag in book.kind?.split(',').slice(0, 2)" :key="tag">
                 {{ tag }}
               </el-tag>
             </div>
@@ -39,9 +31,7 @@
           </div>
           <div class="intro" v-if="isSearch">{{ book.intro }}</div>
 
-          <div class="dur-chapter" v-if="!isSearch">
-            已读：{{ book.durChapterTitle }}
-          </div>
+          <div class="dur-chapter" v-if="!isSearch">已读：{{ book.durChapterTitle }}</div>
           <div class="last-chapter">最新：{{ book.latestChapterTitle }}</div>
         </div>
       </div>
@@ -57,14 +47,10 @@ const handleClick = (book) => emit("bookClick", book);
 const getCover = (coverUrl) => {
   return /^data:/.test(coverUrl)
     ? coverUrl
-    : WEB.getLegadoWebServeUrl() +
-        "/cover?path=" +
-        encodeURIComponent(coverUrl);
+    : WEB.getLegadoWebServeUrl() + "/cover?path=" + encodeURIComponent(coverUrl);
 };
 
-const subJustify = computed(() =>
-  props.isSearch ? "space-between" : "flex-start"
-);
+const subJustify = computed(() => (props.isSearch ? "space-between" : "flex-start"));
 </script>
 
 <style lang="scss" scoped>

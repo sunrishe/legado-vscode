@@ -20,7 +20,7 @@ const update = async (string) => {
   } catch {
     ElMessage({
       message: "粘贴的源格式错误",
-      type: "error",
+      type: "error"
     });
   }
 };

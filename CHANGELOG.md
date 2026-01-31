@@ -4,6 +4,13 @@
 
 格式是基于[Keep a Changelog](https://keepachangelog.com/en/1.0.0/)，这个项目坚持[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.2] - 2026-01-31
+
+### 新增
+
+- 阅读页面：支持隐藏图片功能，可在设置中开启或关闭图片显示 by Tearslee
+- 添加最近阅读记录同步功能 -by Dnsayhey
+
 ## [1.4.1] - 2023-09-20
 
 ### 新增

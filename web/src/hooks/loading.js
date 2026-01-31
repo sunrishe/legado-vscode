@@ -17,13 +17,12 @@ export const useLoading = (target, text, spinner = loadingSvg) => {
       spinner: spinner,
       text: text,
       lock: true,
-      background: "rgba(0, 0, 0, 0)",
+      background: "rgba(0, 0, 0, 0)"
     });
   });
 
   const loadingWrapper = (promise) => {
-    if (!(promise instanceof Promise))
-      throw TypeError("loadingWrapper argument must be Promise");
+    if (!(promise instanceof Promise)) throw TypeError("loadingWrapper argument must be Promise");
     showLoading();
     return promise.finally(closeLoading);
   };

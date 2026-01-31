@@ -3,7 +3,7 @@ import {
   emptyBookSource,
   emptyRssSource,
   getSourceUniqueKey,
-  convertSourcesToMap,
+  convertSourcesToMap
 } from "@utils/souce";
 
 const isBookSource = /bookSource/i.test(location.href);
@@ -22,7 +22,7 @@ export const useSourceStore = defineStore("source", {
       currentSource: emptySource, // 当前编辑的源
       currentTab: localStorage.getItem("tabName") || "editTab",
       editTabSource: {}, // 生成序列化的json数据
-      isDebuging: false,
+      isDebuging: false
     };
   },
   getters: {
@@ -31,13 +31,9 @@ export const useSourceStore = defineStore("source", {
     sourcesMap: (state) => convertSourcesToMap(state.sources),
     savedSourcesMap: (state) => convertSourcesToMap(state.savedSources),
     currentSourceUrl: (state) =>
-      isBookSource
-        ? state.currentSource.bookSourceUrl
-        : state.currentSource.sourceUrl,
+      isBookSource ? state.currentSource.bookSourceUrl : state.currentSource.sourceUrl,
     searchKey: (state) =>
-      isBookSource
-        ? state.currentSource.ruleSearch.checkKeyWord || "我的"
-        : null,
+      isBookSource ? state.currentSource.ruleSearch.checkKeyWord || "我的" : null
   },
   actions: {
     startDebug() {
@@ -127,6 +123,6 @@ export const useSourceStore = defineStore("source", {
       this.bookSources = [];
       this.rssSources = [];
       this.savedSources = [];
-    },
-  },
+    }
+  }
 });

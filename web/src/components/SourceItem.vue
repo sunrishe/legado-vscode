@@ -5,7 +5,7 @@
     :label="sourceUrl"
     :class="{
       error: isSaveError,
-      edit: sourceUrl == currentSourceUrl,
+      edit: sourceUrl == currentSourceUrl
     }"
   >
     {{ source.bookSourceName || source.sourceName }}

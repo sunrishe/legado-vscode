@@ -1,8 +1,5 @@
 <template>
-  <div
-    :class="{ 'cata-wrapper': true, visible: popCataVisible }"
-    :style="popupTheme"
-  >
+  <div :class="{ 'cata-wrapper': true, visible: popCataVisible }" :style="popupTheme">
     <div class="title">目录</div>
     <virtual-list
       style="height: 300px; overflow: auto"
@@ -35,13 +32,13 @@ const theme = computed(() => {
 });
 const popupTheme = computed(() => {
   return {
-    background: settings.themes[theme.value].popup,
+    background: settings.themes[theme.value].popup
   };
 });
 
 const currentChapterIndex = computed({
   get: () => store.readingBook.index,
-  set: (value) => (store.readingBook.index = value),
+  set: (value) => (store.readingBook.index = value)
 });
 
 const virtualListdata = computed(() => {
@@ -56,7 +53,7 @@ const virtualListdata = computed(() => {
   while (i < length) {
     virtualListDataSource[i] = {
       index: i,
-      catas: catalogValue.slice(2 * i, 2 * i + 2),
+      catas: catalogValue.slice(2 * i, 2 * i + 2)
     };
     i++;
   }
@@ -106,8 +103,8 @@ onUpdated(() => {
       //width: 50%;
       height: 40px;
       cursor: pointer;
-      font: 16px / 40px PingFangSC-Regular, HelveticaNeue-Light,
-        "Helvetica Neue Light", "Microsoft YaHei", sans-serif;
+      font: 16px / 40px PingFangSC-Regular, HelveticaNeue-Light, "Helvetica Neue Light",
+        "Microsoft YaHei", sans-serif;
     }
   }
 

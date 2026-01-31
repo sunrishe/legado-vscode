@@ -1,22 +1,11 @@
 <template>
   <div class="menu flex-column-center">
-    <el-button
-      v-for="button in buttons"
-      size="large"
-      :key="button.name"
-      @click="button.action"
-    >
+    <el-button v-for="button in buttons" size="large" :key="button.name" @click="button.action">
       {{ button.name }}
     </el-button>
-    <el-button size="large" @click="() => (hotkeysDialogVisible = true)"
-      >快捷键</el-button
-    >
+    <el-button size="large" @click="() => (hotkeysDialogVisible = true)">快捷键</el-button>
   </div>
-  <el-dialog
-    v-model="hotkeysDialogVisible"
-    :show-close="false"
-    :before-close="stopRecordKeyDown"
-  >
+  <el-dialog v-model="hotkeysDialogVisible" :show-close="false" :before-close="stopRecordKeyDown">
     <template #header="{ titleClass, titleId }">
       <div class="hotkeys-header flex-space-between">
         <div :id="titleId" :class="titleClass">
@@ -25,10 +14,7 @@
             <el-text> / 录入中 </el-text>
           </span>
         </div>
-        <el-button
-          :disabled="recordKeyDowning"
-          @click="saveHotKeys"
-          :icon="CircleCheckFilled"
+        <el-button :disabled="recordKeyDowning" @click="saveHotKeys" :icon="CircleCheckFilled"
           >保存</el-button
         >
       </div>
@@ -52,11 +38,7 @@
           </div>
           <span v-if="button.hotKeys.length == 0">未设置</span>
         </div>
-        <el-button
-          :disabled="recordKeyDowning"
-          text
-          :icon="Edit"
-          @click="recordKeyDown(index)"
+        <el-button :disabled="recordKeyDowning" text :icon="Edit" @click="recordKeyDown(index)"
           >编辑</el-button
         >
       </div>
@@ -75,7 +57,7 @@ const pull = () => {
   const loadingMsg = ElMessage({
     message: "加载中……",
     showClose: true,
-    duration: 0,
+    duration: 0
   });
   API.getSources()
     .then(({ data }) => {
@@ -84,12 +66,12 @@ const pull = () => {
         store.saveSources(data.data);
         ElMessage({
           message: `成功拉取${data.data.length}条源`,
-          type: "success",
+          type: "success"
         });
       } else {
         ElMessage({
           message: data.errorMsg ?? "后端错误",
-          type: "error",
+          type: "error"
         });
       }
     })
@@ -102,12 +84,12 @@ const push = () => {
   if (sources.length === 0) {
     return ElMessage({
       message: "空空如也",
-      type: "info",
+      type: "info"
     });
   }
   ElMessage({
     message: "正在推送中",
-    type: "info",
+    type: "info"
   });
   API.saveSources(sources).then(({ data }) => {
     if (data.isSuccess) {
@@ -119,18 +101,16 @@ const push = () => {
           store.setPushReturnSources(okData);
         }
         ElMessage({
-          message: `批量推送源到「阅读3.0APP」\n共计: ${
-            sources.length
-          } 条\n成功: ${okData.length} 条\n失败: ${
-            sources.length - okData.length
-          } 条${failMsg}`,
-          type: "success",
+          message: `批量推送源到「阅读3.0APP」\n共计: ${sources.length} 条\n成功: ${
+            okData.length
+          } 条\n失败: ${sources.length - okData.length} 条${failMsg}`,
+          type: "success"
         });
       }
     } else {
       ElMessage({
         message: `批量推送源失败!\nErrorMsg: ${data.errorMsg}`,
-        type: "error",
+        type: "error"
       });
     }
   });
@@ -152,7 +132,7 @@ const clearEdit = () => {
   store.clearEdit();
   ElMessage({
     message: "已清除",
-    type: "success",
+    type: "success"
   });
 };
 
@@ -161,7 +141,7 @@ const redo = () => {
   store.clearAllHistory();
   ElMessage({
     message: "已清除所有历史记录",
-    type: "success",
+    type: "success"
   });
 };
 
@@ -176,7 +156,7 @@ const saveSource = () => {
           message: `源《${
             isBookSource ? source.bookSourceName : source.sourceName
           }》已成功保存到「阅读3.0APP」`,
-          type: "success",
+          type: "success"
         });
         //save to store
         store.saveCurrentSource();
@@ -185,14 +165,14 @@ const saveSource = () => {
           message: `源《${
             isBookSource ? source.bookSourceName : source.sourceName
           }》保存失败!\nErrorMsg: ${data.errorMsg}`,
-          type: "error",
+          type: "error"
         });
       }
     });
   } else {
     ElMessage({
       message: `请检查<必填>项是否全部填写`,
-      type: "error",
+      type: "error"
     });
   }
 };
@@ -257,7 +237,7 @@ const recordKeyDown = (index) => {
   recordKeyDowning.value = true;
   ElMessage({
     message: "按ESC键或者点击空白处结束录入",
-    type: "info",
+    type: "info"
   });
   buttons.value[index].hotKeys = [];
   recordKeyDownIndex.value = index;

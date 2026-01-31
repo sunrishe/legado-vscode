@@ -1,11 +1,6 @@
 <template>
   <el-tabs v-model="current_tab">
-    <el-tab-pane
-      v-for="(tab, index) in tabData"
-      :key="tab[0]"
-      :name="tab[0]"
-      :label="tab[1]"
-    >
+    <el-tab-pane v-for="(tab, index) in tabData" :key="tab[0]" :name="tab[0]" :label="tab[1]">
       <source-json v-if="index == 0" />
       <source-debug v-if="index == 1" />
       <source-list v-if="index == 2" />
@@ -25,7 +20,7 @@ const tabData = ref([
   ["editTab", "编辑源"],
   ["editDebug", "调试源"],
   ["editList", "源列表"],
-  ["editHelp", "帮助信息"],
+  ["editHelp", "帮助信息"]
 ]);
 </script>
 

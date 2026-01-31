@@ -5,19 +5,19 @@ export const sourceRoutes = [
   {
     path: "/bookSource",
     name: "book-home",
-    component: sourceEditor,
+    component: sourceEditor
   },
   {
     path: "/rssSource",
     name: "rss-home",
-    component: sourceEditor,
-  },
+    component: sourceEditor
+  }
 ];
 
 const router = createRouter({
   //   history: createWebHistory(process.env.BASE_URL),
   history: createWebHashHistory(),
-  routes: sourceRoutes,
+  routes: sourceRoutes
 });
 
 export default router;

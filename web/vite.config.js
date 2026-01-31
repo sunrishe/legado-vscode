@@ -18,39 +18,39 @@ export default ({ mode }) =>
         include: [/\.[tj]sx?$/, /\.vue$/, /\.vue\?vue/, /\.md$/],
         dirs: ["src/components", "src/store"],
         eslintrc: {
-          enabled: true,
+          enabled: true
         },
         resolvers: [
           ElementPlusResolver(),
           IconsResolver({
-            prefix: "Icon",
-          }),
+            prefix: "Icon"
+          })
         ],
-        dts: "./src/auto-imports.d.ts",
+        dts: "./src/auto-imports.d.ts"
       }),
       Components({
         resolvers: [
           ElementPlusResolver(),
           IconsResolver({
-            enabledCollections: ["ep"],
-          }),
+            enabledCollections: ["ep"]
+          })
         ],
-        dts: "./src/components.d.ts",
+        dts: "./src/components.d.ts"
       }),
       Icons({
-        autoInstall: true,
-      }),
+        autoInstall: true
+      })
     ],
     base: mode === "development" ? "/" : "./",
     server: {
-      port: 8080,
+      port: 8080
     },
     resolve: {
       alias: {
         "@": fileURLToPath(new URL("./src", import.meta.url)),
         "@api": fileURLToPath(new URL("./src/api", import.meta.url)),
-        "@utils": fileURLToPath(new URL("./src/utils/", import.meta.url)),
-      },
+        "@utils": fileURLToPath(new URL("./src/utils/", import.meta.url))
+      }
     },
     build: {
       rollupOptions: {
