@@ -1,11 +1,16 @@
-<template>
+﻿<template>
   <div
     class="chapter-wrapper"
-    :style="bodyTheme"
+    ref="chapterWrapper"
+    :style="chapterWrapperTheme"
     :class="{ night: isNight, day: !isNight }"
     @click="showToolBar = !showToolBar"
+    @scroll="requestLoadMoreCheck"
   >
-    <div class="tool-bar" :style="leftBarTheme">
+    <div
+      class="tool-bar"
+      :style="leftBarTheme"
+    >
       <div class="tools">
         <el-popover
           placement="right"
@@ -15,9 +20,15 @@
           v-model:visible="popCataVisible"
           popper-class="pop-cata"
         >
-          <PopCatalog @getContent="getContent" class="popup" />
+          <PopCatalog
+            @getContent="getContent"
+            class="popup"
+          />
           <template #reference>
-            <div class="tool-icon" :class="{ 'no-point': noPoint }">
+            <div
+              class="tool-icon"
+              :class="{ 'no-point': noPoint }"
+            >
               <div class="iconfont">&#58905;</div>
               <div class="icon-text">目录</div>
             </div>
@@ -33,17 +44,27 @@
         >
           <read-settings class="popup" />
           <template #reference>
-            <div class="tool-icon" :class="{ 'no-point': noPoint }">
+            <div
+              class="tool-icon"
+              :class="{ 'no-point': noPoint }"
+            >
               <div class="iconfont">&#58971;</div>
               <div class="icon-text">设置</div>
             </div>
           </template>
         </el-popover>
-        <div class="tool-icon" @click="toShelf">
+        <div
+          class="tool-icon"
+          @click="toShelf"
+        >
           <div class="iconfont">&#58892;</div>
           <div class="icon-text">书架</div>
         </div>
-        <div class="tool-icon" :class="{ 'no-point': noPoint }" @click="toTop">
+        <div
+          class="tool-icon"
+          :class="{ 'no-point': noPoint }"
+          @click="toTop"
+        >
           <div class="iconfont">&#58914;</div>
           <div class="icon-text">顶部</div>
         </div>
@@ -57,7 +78,10 @@
         </div>
       </div>
     </div>
-    <div class="read-bar" :style="rightBarTheme">
+    <div
+      class="read-bar"
+      :style="rightBarTheme"
+    >
       <div class="tools">
         <div
           class="tool-icon"
@@ -78,9 +102,16 @@
       </div>
     </div>
     <div class="chapter-bar"></div>
-    <div class="chapter" ref="content" :style="chapterTheme">
+    <div
+      class="chapter"
+      ref="content"
+      :style="chapterTheme"
+    >
       <div class="content">
-        <div class="top-bar" ref="top"></div>
+        <div
+          class="top-bar"
+          ref="top"
+        ></div>
         <div
           v-for="data in chapterData"
           :key="data.index"
@@ -95,12 +126,19 @@
             :spacing="store.config.spacing"
             :fontSize="fontSize"
             :fontFamily="fontFamily"
+            :scrollContainer="chapterWrapper"
             @readedLengthChange="onReadedLengthChange"
             v-if="showContent"
           />
         </div>
-        <div class="loading" ref="loading"></div>
-        <div class="bottom-bar" ref="bottom"></div>
+        <div
+          class="loading"
+          ref="loading"
+        ></div>
+        <div
+          class="bottom-bar"
+          ref="bottom"
+        ></div>
       </div>
     </div>
   </div>
@@ -108,23 +146,22 @@
 
 <script setup>
 import jump from "@/plugins/jump";
-import settings from "@/config/themeConfig";
+import settings, { getScrollbarTheme, isDarkTheme } from "@/config/themeConfig";
 import API from "@api";
 import WEB from "@/api/web";
 import { useLoading } from "@/hooks/loading";
+import { showMessage } from "@/hooks/message";
+import { loadLocalReadConfig, syncThemeWithColorMode } from "@/hooks/theme";
 
+const chapterWrapper = ref();
 const content = ref();
 // loading spinner
 const { isLoading, loadingWrapper } = useLoading(content, "正在获取信息");
 const store = useBookStore();
 
-// 读取阅读配置
-try {
-  const browerConfig = JSON.parse(localStorage.getItem("config"));
-  if (browerConfig != null) store.setConfig(browerConfig);
-} catch {
-  localStorage.removeItem("config");
-}
+// 读取本地阅读配置后立即按当前环境校正浅色/深色，避免直达阅读页时旧配置覆盖首屏主题
+loadLocalReadConfig();
+syncThemeWithColorMode(undefined, { upload: false });
 
 const {
   catalog,
@@ -134,15 +171,15 @@ const {
   showContent,
   config,
   readingBook,
-  bookProgress,
+  bookProgress
 } = storeToRefs(store);
 const chapterPos = computed({
   get: () => readingBook.value.chapterPos,
-  set: (value) => (readingBook.value.chapterPos = value),
+  set: (value) => (readingBook.value.chapterPos = value)
 });
 const chapterIndex = computed({
   get: () => readingBook.value.index,
-  set: (value) => (readingBook.value.index = value),
+  set: (value) => (readingBook.value.index = value)
 });
 
 const theme = computed(() => config.value.theme);
@@ -180,37 +217,41 @@ const popupWidth = computed(() => {
     return window.innerWidth - 33;
   }
 });
-const bodyTheme = computed(() => {
+const scrollbarTheme = computed(() => {
+  return getScrollbarTheme(theme.value);
+});
+const chapterWrapperTheme = computed(() => {
   return {
     background: bodyColor.value,
+    "--app-scrollbar-thumb": scrollbarTheme.value.thumb,
+    "--app-scrollbar-thumb-hover": scrollbarTheme.value.hover
   };
 });
 const chapterTheme = computed(() => {
   return {
     background: chapterColor.value,
-    width: readWidth.value,
+    width: readWidth.value
   };
 });
 const showToolBar = ref(false);
 const leftBarTheme = computed(() => {
   return {
     background: popupColor.value,
-    marginLeft: miniInterface.value
-      ? 0
-      : -(store.config.readWidth / 2 + 68) + "px",
-    display: miniInterface.value && !showToolBar.value ? "none" : "block",
+    marginLeft: miniInterface.value ? 0 : -(store.config.readWidth / 2 + 68) + "px",
+    display: miniInterface.value && !showToolBar.value ? "none" : "block"
   };
 });
 const rightBarTheme = computed(() => {
   return {
     background: popupColor.value,
-    marginRight: miniInterface.value
-      ? 0
-      : -(store.config.readWidth / 2 + 52) + "px",
-    display: miniInterface.value && !showToolBar.value ? "none" : "block",
+    marginRight: miniInterface.value ? 0 : -(store.config.readWidth / 2 + 52) + "px",
+    display: miniInterface.value && !showToolBar.value ? "none" : "block"
   };
 });
-const isNight = computed(() => theme.value == 6);
+const isNight = computed(() => isDarkTheme(theme.value));
+const jumpInChapter = (target, options = {}) => {
+  jump(target, { ...options, container: chapterWrapper.value });
+};
 
 /**
  * pc移动端判断 最大阅读宽度修正
@@ -234,10 +275,10 @@ watch(
 const top = ref();
 const bottom = ref();
 const toTop = () => {
-  jump(top.value);
+  jumpInChapter(top.value);
 };
 const toBottom = () => {
-  jump(bottom.value);
+  jumpInChapter(bottom.value);
 };
 
 // 书架路由切换
@@ -259,7 +300,7 @@ const getContent = (index, reloadChapter = true, chapterPos = 0) => {
     //展示进度条
     store.setShowContent(false);
     //强制滚回顶层
-    jump(top.value, { duration: 0 });
+    jumpInChapter(top.value, { duration: 0 });
     //从目录，按钮切换章节时保存进度 预加载时不保存
     saveReadingBookProgressToBrowser(index, chapterPos);
     //加载新章节内容时，强制保存阅读进度到APP
@@ -278,7 +319,7 @@ const getContent = (index, reloadChapter = true, chapterPos = 0) => {
           chapterData.value.push({ index, content, title });
           if (reloadChapter) toChapterPos(chapterPos);
         } else {
-          ElMessage({ message: res.data.errorMsg, type: "error" });
+          showMessage({ message: res.data.errorMsg, type: "error" });
           let content = [res.data.errorMsg];
           chapterData.value.push({ index, content, title });
         }
@@ -290,14 +331,18 @@ const getContent = (index, reloadChapter = true, chapterPos = 0) => {
         }
       },
       (err) => {
-        ElMessage({ message: "获取章节内容失败", type: "error" });
+        showMessage({ message: "获取章节内容失败", type: "error" });
         let content = ["获取章节内容失败！"];
         chapterData.value.push({ index, content, title });
         store.setShowContent(true);
         throw err;
       }
     )
-  );
+  ).finally(() => {
+    nextTick(() => {
+      requestLoadMoreCheck();
+    });
+  });
 };
 
 // 章节进度跳转和计算
@@ -305,8 +350,7 @@ const chapter = ref();
 const chapterRef = ref();
 const toChapterPos = (pos) => {
   nextTick(() => {
-    if (chapterRef.value.length === 1)
-      chapterRef.value[0].scrollToReadedLength(pos);
+    if (chapterRef.value.length === 1) chapterRef.value[0].scrollToReadedLength(pos);
   });
 };
 const onReadedLengthChange = (index, pos) => {
@@ -386,15 +430,15 @@ const toNextChapter = () => {
   store.setContentLoading(true);
   let index = chapterIndex.value + 1;
   if (typeof catalog.value[index] !== "undefined") {
-    ElMessage({
+    showMessage({
       message: "下一章",
-      type: "info",
+      type: "info"
     });
     getContent(index);
   } else {
-    ElMessage({
+    showMessage({
       message: "本章是最后一章",
-      type: "error",
+      type: "error"
     });
   }
 };
@@ -402,15 +446,15 @@ const toPreChapter = () => {
   store.setContentLoading(true);
   let index = chapterIndex.value - 1;
   if (typeof catalog.value[index] !== "undefined") {
-    ElMessage({
+    showMessage({
       message: "上一章",
-      type: "info",
+      type: "info"
     });
     getContent(index);
   } else {
-    ElMessage({
+    showMessage({
       message: "本章是第一章",
-      type: "error",
+      type: "error"
     });
   }
 };
@@ -429,6 +473,26 @@ const loadMore = () => {
   let index = chapterData.value.slice(-1)[0]?.index;
   if (catalog.value.length - 1 > index) {
     getContent(index + 1, false);
+  }
+};
+let loadMoreCheckHandler;
+const requestLoadMoreCheck = () => {
+  if (loadMoreCheckHandler) {
+    window.cancelAnimationFrame(loadMoreCheckHandler);
+  }
+  loadMoreCheckHandler = window.requestAnimationFrame(() => {
+    loadMoreCheckHandler = null;
+    loadMoreIfNeeded();
+  });
+};
+const loadMoreIfNeeded = () => {
+  if (!infiniteLoading.value || isLoading.value) return;
+
+  const container = chapterWrapper.value || document.documentElement;
+  const distanceToBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+  // 底部有 64px 占位，内容刚好填满时也应继续加载下一章
+  if (distanceToBottom <= 80) {
+    loadMore();
   }
 };
 // IntersectionObserver回调 底部加载
@@ -453,16 +517,23 @@ const reobserveLoading = (force = false) => {
       scrollObserver?.disconnect();
       scrollObserver = new IntersectionObserver(onReachBottom, {
         // 解决vscode下rootMargin无效的问题
-        root: WEB.isVscode() ? document : null,
-        rootMargin: `-100% 0% 120%`,
+        root: chapterWrapper.value || null,
+        rootMargin: `-100% 0% 120%`
       });
       infiniteLoading.value && scrollObserver.observe(loading.value);
     });
   }
 };
 
-// 监听方向键
+const isEditableElement = (target) => {
+  const tagName = target?.tagName?.toLowerCase();
+  return tagName === "input" || tagName === "textarea" || target?.isContentEditable;
+};
+
+// 监听快捷键
 const handleKeyPress = (event) => {
+  if (isEditableElement(event.target)) return;
+
   switch (event.key) {
     case "Q":
     case "q":
@@ -481,6 +552,12 @@ const handleKeyPress = (event) => {
       event.stopPropagation();
       event.preventDefault();
       getContent(chapterIndex.value);
+      break;
+    case "X":
+    case "x":
+      event.stopPropagation();
+      event.preventDefault();
+      WEB.closePanel();
       break;
     case "ArrowLeft":
     case "A":
@@ -501,13 +578,15 @@ const handleKeyPress = (event) => {
     case "w":
       event.stopPropagation();
       event.preventDefault();
-      if (document.documentElement.scrollTop === 0) {
-        ElMessage({
+      if (!chapterWrapper.value || chapterWrapper.value.scrollTop === 0) {
+        showMessage({
           message: "已到达页面顶部",
-          type: "warn",
+          type: "warn"
         });
       } else {
-        jump(0 - document.documentElement.clientHeight + 50, { duration: 100 });
+        jumpInChapter(0 - chapterWrapper.value.clientHeight + 50, {
+          duration: 100
+        });
       }
       break;
     case "ArrowDown":
@@ -516,16 +595,18 @@ const handleKeyPress = (event) => {
       event.stopPropagation();
       event.preventDefault();
       if (
-        document.documentElement.clientHeight +
-          document.documentElement.scrollTop ===
-        document.documentElement.scrollHeight
+        !chapterWrapper.value ||
+        chapterWrapper.value.clientHeight + chapterWrapper.value.scrollTop >=
+          chapterWrapper.value.scrollHeight - 1
       ) {
-        ElMessage({
+        showMessage({
           message: "已到达页面底部",
-          type: "warn",
+          type: "warn"
         });
       } else {
-        jump(document.documentElement.clientHeight - 50, { duration: 100 });
+        jumpInChapter(chapterWrapper.value.clientHeight - 50, {
+          duration: 100
+        });
       }
       break;
   }
@@ -538,17 +619,13 @@ onMounted(() => {
   let chapterIndex = Number(sessionStorage.getItem("chapterIndex") || 0);
   let chapterPos = Number(sessionStorage.getItem("chapterPos") || 0);
   var book = JSON.parse(localStorage.getItem(bookUrl));
-  if (
-    book == null ||
-    chapterIndex != book.index ||
-    chapterPos != book.chapterPos
-  ) {
+  if (book == null || chapterIndex != book.index || chapterPos != book.chapterPos) {
     book = {
       bookName: bookName,
       bookAuthor: bookAuthor,
       bookUrl: bookUrl,
       index: chapterIndex,
-      chapterPos: chapterPos,
+      chapterPos: chapterPos
     };
     localStorage.setItem(bookUrl, JSON.stringify(book));
   }
@@ -559,7 +636,7 @@ onMounted(() => {
     API.getChapterList(bookUrl).then(
       (res) => {
         if (!res.data.isSuccess) {
-          ElMessage({ message: res.data.errorMsg, type: "error" });
+          showMessage({ message: res.data.errorMsg, type: "error" });
           setTimeout(toShelf, 500);
           return;
         }
@@ -578,7 +655,7 @@ onMounted(() => {
         document.title = bookName + " | " + catalog.value[chapterIndex].title;
       },
       (err) => {
-        ElMessage({ message: "获取书籍目录失败", type: "error" });
+        showMessage({ message: "获取书籍目录失败", type: "error" });
         throw err;
       }
     )
@@ -594,6 +671,9 @@ onUnmounted(() => {
   document.removeEventListener("visibilitychange", onVisibilityChange);
   readSettingsVisible.value = false;
   popCataVisible.value = false;
+  if (loadMoreCheckHandler) {
+    window.cancelAnimationFrame(loadMoreCheckHandler);
+  }
   scrollObserver?.disconnect();
 });
 </script>
@@ -609,9 +689,33 @@ onUnmounted(() => {
 }
 
 .chapter-wrapper {
+  height: 100vh;
   padding: 0 4%;
 
   overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-color: var(--app-scrollbar-thumb) transparent;
+  scrollbar-width: auto;
+
+  &::-webkit-scrollbar {
+    width: 14px;
+    height: 14px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--app-scrollbar-thumb);
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background-clip: content-box;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: var(--app-scrollbar-thumb-hover);
+  }
 
   :deep(.no-point) {
     pointer-events: none;
@@ -684,8 +788,8 @@ onUnmounted(() => {
   }
 
   .chapter {
-    font-family: "Microsoft YaHei", PingFangSC-Regular, HelveticaNeue-Light,
-      "Helvetica Neue Light", sans-serif;
+    font-family: "Microsoft YaHei", PingFangSC-Regular, HelveticaNeue-Light, "Helvetica Neue Light",
+      sans-serif;
     text-align: left;
     padding: 0 65px;
     min-height: 100vh;

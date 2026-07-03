@@ -1,10 +1,11 @@
 # 阅读VS Code插件
 
-[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/sunrishe.legado-vscode?label=version)](https://marketplace.visualstudio.com/items?itemName=sunrishe.legado-vscode)
-[![Visual Studio Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/sunrishe.legado-vscode?label=downloads)](https://marketplace.visualstudio.com/items?itemName=sunrishe.legado-vscode)
-[![stars](https://img.shields.io/github/stars/sunrishe/legado-vscode)](https://github.com/sunrishe/legado-vscode.git)
-[![issues](https://img.shields.io/github/issues/sunrishe/legado-vscode)](https://github.com/sunrishe/legado-vscode.git)
-[![GitHub License](https://img.shields.io/github/license/sunrishe/legado-vscode)](https://github.com/sunrishe/legado-vscode.git)
+[![Visual Studio Marketplace Version](https://badgen.net/vs-marketplace/v/sunrishe.legado-vscode)](https://marketplace.visualstudio.com/items?itemName=sunrishe.legado-vscode)
+[![Visual Studio Marketplace Downloads](https://badgen.net/vs-marketplace/d/sunrishe.legado-vscode)](https://marketplace.visualstudio.com/items?itemName=sunrishe.legado-vscode)
+[![stars](https://badgen.net/github/stars/sunrishe/legado-vscode)](https://github.com/sunrishe/legado-vscode.git)
+[![issues](https://badgen.net/github/open-issues/sunrishe/legado-vscode)](https://github.com/sunrishe/legado-vscode/issues)
+[![PRs](https://badgen.net/github/open-prs/sunrishe/legado-vscode)](https://github.com/sunrishe/legado-vscode/pulls)
+[![GitHub License](https://badgen.net/github/license/sunrishe/legado-vscode)](https://github.com/sunrishe/legado-vscode.git)
 
 📕 [GitHub仓库](https://github.com/sunrishe/legado-vscode.git)
 📗 [VS Code插件市场](https://marketplace.visualstudio.com/items?itemName=sunrishe.legado-vscode)
@@ -24,17 +25,27 @@
 
 点击基本设定下的状态栏，可以设置阅读APP的WEB服务访问地址。
 
-### 阅读界面
+### 快捷键
+
+#### 书架页面
+
+<kbd>R</kbd> 刷新页面
+
+<kbd>X</kbd> 关闭页面
+
+#### 阅读页面
 
 <kbd>Q</kbd> 返回书架
 
 <kbd>E</kbd> 打开/关闭章节列表
 
-<kbd>R</kbd> 重新获取当前章节内容，适用于章节下载失败或乱码
+<kbd>R</kbd> 刷新页面
 
-<kbd>W</kbd>或<kbd>↑</kbd> 向上翻页
+<kbd>X</kbd> 关闭页面
 
-<kbd>S</kbd>或<kbd>↓</kbd> 向下翻页
+<kbd>W</kbd>或<kbd>↑</kbd>或<kbd>PgUp</kbd> 向上翻页
+
+<kbd>S</kbd>或<kbd>↓</kbd>或<kbd>PgDn</kbd>或<kbd>空格</kbd> 向下翻页
 
 <kbd>A</kbd>或<kbd>←</kbd> 上一章
 

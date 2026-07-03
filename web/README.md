@@ -1,9 +1,8 @@
 # 阅读web端
- 使用vue3 web书架和web源编辑
+使用 vue3 web 书架和阅读页
 ## 路由
 * http://localhost:8080/ 书架
-* http://localhost:8080/#/bookSource 书源编辑
-* http://localhost:8080/#/rssSource 订阅源编辑
+* http://localhost:8080/#/chapter 阅读页
 
 ## 兼容性
 

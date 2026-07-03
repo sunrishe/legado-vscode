@@ -1,9 +1,25 @@
 import axios from "axios";
 
-// @ts-ignore
-const vscode = typeof acquireVsCodeApi === "function" ? acquireVsCodeApi() : undefined;
+const vscode =
+  typeof window.acquireVsCodeApi === "function" ? window.acquireVsCodeApi() : undefined;
 
 const isVscode = () => !!vscode;
+
+const getPanelTitle = () => {
+  return localStorage.getItem("legadoPanelTitle") || document.title || "阅读";
+};
+
+const setPanelTitle = (title) => {
+  localStorage.setItem("legadoPanelTitle", title);
+  document.title = title;
+  if (vscode) {
+    vscode.postMessage({
+      command: "setConfiguration",
+      key: "legado-vscode.panelTitle",
+      value: title
+    });
+  }
+};
 
 const getLegadoWebServeUrl = () => {
   let legadoWebServeUrl = localStorage.getItem("legadoWebServeUrl");
@@ -40,10 +56,23 @@ const reload = () => {
   }
 };
 
+const closePanel = () => {
+  if (vscode) {
+    vscode.postMessage({
+      command: "close"
+    });
+  } else {
+    window.close();
+  }
+};
+
 export default {
   isVscode,
+  getPanelTitle,
+  setPanelTitle,
   getLegadoWebServeUrl,
   setLegadoWebServeUrl,
   checkLegadoWebServeUrl,
-  reload
+  reload,
+  closePanel
 };

@@ -13,7 +13,7 @@
   ],
   "publisher": "sunrishe",
   "license": "GPL-3.0",
-  "version": "1.4.1",
+  "version": "2.9.3",
   "icon": "public/ic_launcher.png",
   "qna": "https://github.com/sunrishe/legado-vscode/issues",
   "bugs": {
@@ -25,13 +25,14 @@
     "url": "https://github.com/sunrishe/legado-vscode.git"
   },
   "engines": {
-    "vscode": "^1.25.0"
+    "vscode": "^1.45.0"
   },
   "categories": [
     "Other"
   ],
   "activationEvents": [
-    "onCommand:legado-vscode.openLegado"
+    "onCommand:legado-vscode.openLegado",
+    "onCommand:legado-vscode.closeLegado"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -39,6 +40,11 @@
       {
         "command": "legado-vscode.openLegado",
         "title": "打开阅读APP书架",
+        "category": "阅读APP Legado"
+      },
+      {
+        "command": "legado-vscode.closeLegado",
+        "title": "关闭阅读APP书架",
         "category": "阅读APP Legado"
       }
     ],
@@ -83,7 +89,7 @@
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "16.x",
-    "@types/vscode": "^1.25.0",
+    "@types/vscode": "1.45.0",
     "@typescript-eslint/eslint-plugin": "^5.59.1",
     "@typescript-eslint/parser": "^5.59.1",
     "@vscode/test-electron": "^2.3.0",

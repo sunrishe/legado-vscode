@@ -1,8 +1,18 @@
-<template>
+﻿<template>
   <div :class="{ 'index-wrapper': true, night: isNight, day: !isNight }">
     <div class="navigation-wrapper">
       <div class="navigation-title-wrapper">
-        <div class="navigation-title">阅读</div>
+        <div class="navigation-title-row">
+          <div class="navigation-title">阅读</div>
+          <button
+            class="theme-toggle"
+            type="button"
+            :title="isNight ? '切换浅色主题' : '切换深色主题'"
+            @click.stop="toggleColorMode"
+          >
+            {{ isNight ? "" : "" }}
+          </button>
+        </div>
         <div class="navigation-sub-title">清风不识字，何故乱翻书</div>
       </div>
       <div class="search-wrapper">
@@ -11,7 +21,6 @@
           v-model="search"
           class="search-input"
           :prefix-icon="Search"
-          @keyup.enter="searchBook"
         >
         </el-input>
       </div>
@@ -50,25 +59,44 @@
             >
               {{ connectStatus }}
             </el-tag>
+            <el-tag
+              size="large"
+              class="setting-connect setting-refresh"
+              @click="reloadPage"
+            >
+              刷新页面
+            </el-tag>
+            <el-tag
+              size="large"
+              class="setting-connect setting-shortcuts"
+              @click="showShortcuts"
+            >
+              快捷键
+            </el-tag>
           </div>
         </div>
       </div>
       <div class="bottom-icons">
         <a
-          href="https://github.com/gedoor/legado_web_bookshelf"
+          href="https://github.com/sunrishe/legado-vscode"
           target="_blank"
         >
           <div class="bottom-icon">
-            <img :src="githubUrl" alt="" />
+            <img
+              :src="githubUrl"
+              alt=""
+            />
           </div>
         </a>
       </div>
     </div>
-    <div class="shelf-wrapper" ref="shelfWrapper">
+    <div
+      class="shelf-wrapper"
+      ref="shelfWrapper"
+    >
       <book-items
         :books="books"
         @bookClick="handleBookClick"
-        :isSearch="isSearching"
       ></book-items>
     </div>
   </div>
@@ -76,9 +104,15 @@
 
 <script setup>
 import "@/assets/fonts/shelffont.css";
+import "@/assets/fonts/iconfont.css";
 import { useBookStore } from "@/store";
 import githubUrl from "@/assets/imgs/github.png";
 import { useLoading } from "@/hooks/loading";
+import { showMessage } from "@/hooks/message";
+import { toggleColorMode } from "@/hooks/theme";
+import { isDarkTheme } from "@/config/themeConfig";
+import { defineComponent, h, reactive } from "vue";
+import { ElInput } from "element-plus";
 import { Search } from "@element-plus/icons-vue";
 import API from "@api";
 import WEB from "@/api/web";
@@ -89,121 +123,213 @@ const { connectStatus, connectType, newConnect, shelf } = storeToRefs(store);
 const theme = computed(() => {
   return store.config.theme;
 });
-const isNight = computed(() => theme.value == 6);
+const isNight = computed(() => isDarkTheme(theme.value));
 
 const readingRecent = ref({
   name: "尚无阅读记录",
   author: "",
   url: "",
   chapterIndex: 0,
-  chapterPos: 0,
+  chapterPos: 0
 });
+const pageTitle = ref(WEB.getPanelTitle());
 const shelfWrapper = ref(null);
-const { showLoading, closeLoading, loadingWrapper } = useLoading(
-  shelfWrapper,
-  "正在获取书籍信息"
-);
+const { loadingWrapper } = useLoading(shelfWrapper, "正在获取书籍信息");
 
 const books = ref([]);
 
 const search = ref("");
-const isSearching = ref(false);
 watchEffect(() => {
-  if (isSearching.value && search.value != "") return;
-  isSearching.value = false;
   books.value = [];
   if (search.value == "") {
     books.value = shelf.value;
     return;
   }
   books.value = shelf.value.filter((book) => {
-    return (
-      book.name.includes(search.value) || book.author.includes(search.value)
-    );
+    return book.name.includes(search.value) || book.author.includes(search.value);
   });
 });
 
-const searchBook = () => {
-  if (search.value == "") return;
-  books.value = [];
-  store.clearSearchBooks();
-  showLoading();
-  isSearching.value = true;
-  API.search(
-    search.value,
-    (data) => {
-      try {
-        store.setSearchBooks(JSON.parse(data));
-        store.searchBooks.forEach((item) => books.value.push(item));
-      } catch (e) {
-        ElMessage.error("后端数据错误");
-        throw e;
-      }
-    },
-    () => {
-      closeLoading();
-      if (books.value.length == 0) {
-        ElMessage.info("搜索结果为空");
+const isValidWebServeUrl = (input) => {
+  let url;
+  try {
+    url = new URL(input);
+  } catch {
+    return false;
+  }
+
+  if (!["http:", "https:"].includes(url.protocol)) return false;
+  if (!url.hostname) return false;
+  if (url.pathname !== "/" || url.search || url.hash) return false;
+
+  if (url.port) {
+    let port = Number(url.port);
+    if (!Number.isInteger(port) || port < 1 || port > 65535) return false;
+  }
+
+  if (/^\d+\.\d+\.\d+\.\d+$/.test(url.hostname)) {
+    let ips = url.hostname.split(".");
+    for (let i = 0; i < ips.length; i++) {
+      let ip = Number(ips[i]);
+      if (!Number.isInteger(ip) || ip > 255) {
+        return false;
       }
     }
-  );
+  } else {
+    let domainReg =
+      /^(localhost|(?=.{1,253}$)([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,63})$/;
+    if (!domainReg.test(url.hostname)) {
+      return false;
+    }
+  }
+
+  return true;
 };
 
-const setIP = () => {
-  ElMessageBox.prompt("请输入阅读WEB服务地址", "设置", {
+const openSettings = () => {
+  const oldWebServeUrl = WEB.getLegadoWebServeUrl();
+  const form = reactive({
+    panelTitle: WEB.getPanelTitle(),
+    webServeUrl: oldWebServeUrl
+  });
+  const errors = reactive({
+    panelTitle: "",
+    webServeUrl: ""
+  });
+  const validatePanelTitle = () => {
+    errors.panelTitle = form.panelTitle.trim() ? "" : "标题不能为空";
+    return !errors.panelTitle;
+  };
+  const validateWebServeUrl = () => {
+    errors.webServeUrl = isValidWebServeUrl(form.webServeUrl.trim()) ? "" : "无效的地址";
+    return !errors.webServeUrl;
+  };
+  const errorStyle = {
+    color: "var(--el-color-danger)",
+    fontSize: "12px",
+    lineHeight: "16px",
+    marginTop: "6px"
+  };
+  const labelStyle = {
+    display: "block",
+    marginBottom: "8px",
+    color: "var(--el-text-color-regular)",
+    fontSize: "14px"
+  };
+  const inputStyle = {
+    width: "100%"
+  };
+  const SettingsForm = defineComponent({
+    setup() {
+      return () =>
+        h(
+          "div",
+          {
+            style: {
+              display: "flex",
+              flexDirection: "column",
+              gap: "14px",
+              width: "100%"
+            }
+          },
+          [
+            h("div", null, [
+              h("label", { style: labelStyle }, "页面标题"),
+              h(ElInput, {
+                modelValue: form.panelTitle,
+                "onUpdate:modelValue": (value) => {
+                  form.panelTitle = value;
+                  validatePanelTitle();
+                },
+                clearable: true,
+                validateEvent: false,
+                placeholder: "请输入页面标题",
+                style: inputStyle
+              }),
+              errors.panelTitle ? h("div", { style: errorStyle }, errors.panelTitle) : null
+            ]),
+            h("div", null, [
+              h("label", { style: labelStyle }, "阅读WEB服务地址"),
+              h(ElInput, {
+                modelValue: form.webServeUrl,
+                "onUpdate:modelValue": (value) => {
+                  form.webServeUrl = value;
+                  validateWebServeUrl();
+                },
+                clearable: true,
+                validateEvent: false,
+                placeholder: "请输入阅读WEB服务地址",
+                style: inputStyle
+              }),
+              errors.webServeUrl ? h("div", { style: errorStyle }, errors.webServeUrl) : null
+            ])
+          ]
+        );
+    }
+  });
+
+  return ElMessageBox({
+    title: "设置",
+    message: h(SettingsForm),
+    customClass: "settings-message-box",
     confirmButtonText: "确定",
     cancelButtonText: "取消",
-    inputValue: WEB.getLegadoWebServeUrl(),
-    inputValidator: (input) => {
-      let reg = /^https?:\/\/((?:\d{1,3}\.){3}(?:\d{1,3})):(\d{1,5})$/;
-      if (!reg.test(input)) {
-        return false;
-      }
-      let res = reg.exec(input);
-      let ips = res[1].split(".");
-      for (let i = 0; i < ips.length; i++) {
-        let ip = parseInt(ips[i]);
-        if (ip > 255) {
-          return false;
-        }
-      }
-      let port = parseInt(res[2]);
-      if (port > 65535) {
-        return false;
-      }
-      return true;
-    },
-    inputErrorMessage: "无效的地址",
+    showCancelButton: true,
     closeOnClickModal: false,
     beforeClose: (action, instance, done) => {
       if (action !== "confirm") {
         done();
         return;
       }
-      // store.setNewConnect(true);
+
+      const url = form.webServeUrl.trim();
+      const isTitleValid = validatePanelTitle();
+      const isUrlValid = validateWebServeUrl();
+      if (!isTitleValid) {
+        showMessage.error("标题不能为空");
+        return;
+      }
+      if (!isUrlValid) {
+        showMessage.error("无效的地址");
+        return;
+      }
+      if (url === oldWebServeUrl) {
+        done();
+        return;
+      }
+
       instance.confirmButtonLoading = true;
       instance.confirmButtonText = "正在连接";
-      WEB.checkLegadoWebServeUrl(instance.inputValue)
+      WEB.checkLegadoWebServeUrl(url)
         .then(() => {
-          // store.setConnectType("success");
-          // store.setConnectStatus("已连接 ");
-          // store.setNewConnect(false);
           done();
         })
         .catch(() => {
           instance.confirmButtonLoading = false;
           instance.confirmButtonText = "确定";
-          // store.setConnectType("danger");
-          // store.setConnectStatus("连接失败");
-          // store.setNewConnect(false);
-          ElMessage.error(`${instance.inputValue} 连接失败`);
+          showMessage.error(`${url} 连接失败`);
         });
     }
-  })
-    .then(({ value }) => {
-      WEB.setLegadoWebServeUrl(value);
-      ElMessage.success({
-        message: `${value} 连接成功，即将重新加载`,
+  }).then(() => ({
+    title: form.panelTitle.trim(),
+    webServeUrl: form.webServeUrl.trim()
+  }));
+};
+
+const setIP = () => {
+  openSettings()
+    .then(({ title, webServeUrl }) => {
+      const oldWebServeUrl = WEB.getLegadoWebServeUrl();
+      const shouldReload = webServeUrl !== oldWebServeUrl;
+      pageTitle.value = title;
+      WEB.setPanelTitle(title);
+      WEB.setLegadoWebServeUrl(webServeUrl);
+      if (!shouldReload) {
+        showMessage.success("设置已保存");
+        return;
+      }
+      showMessage.success({
+        message: `${webServeUrl} 连接成功，即将重新加载`,
         duration: 1000,
         onClose: () => {
           WEB.reload();
@@ -215,13 +341,7 @@ const setIP = () => {
 
 const router = useRouter();
 const handleBookClick = async (book) => {
-  const {
-    bookUrl,
-    name,
-    author,
-    durChapterIndex = 0,
-    durChapterPos = 0,
-  } = book;
+  const { bookUrl, name, author, durChapterIndex = 0, durChapterPos = 0 } = book;
   await API.saveBook(book);
   toDetail(bookUrl, name, author, durChapterIndex, durChapterPos);
 };
@@ -237,15 +357,102 @@ const toDetail = (bookUrl, bookName, bookAuthor, chapterIndex, chapterPos) => {
     author: bookAuthor,
     url: bookUrl,
     chapterIndex: chapterIndex,
-    chapterPos: chapterPos,
+    chapterPos: chapterPos
   };
   localStorage.setItem("readingRecent", JSON.stringify(readingRecent.value));
   router.push({
-    path: "/chapter",
+    path: "/chapter"
   });
 };
 
+const reloadPage = () => {
+  WEB.reload();
+};
+
+const closePage = () => {
+  WEB.closePanel();
+};
+
+const isEditableElement = (target) => {
+  const tagName = target?.tagName?.toLowerCase();
+  return tagName === "input" || tagName === "textarea" || target?.isContentEditable;
+};
+
+const handleKeyPress = (event) => {
+  if (isEditableElement(event.target)) return;
+
+  switch (event.key) {
+    case "R":
+    case "r":
+      event.stopPropagation();
+      event.preventDefault();
+      reloadPage();
+      break;
+    case "X":
+    case "x":
+      event.stopPropagation();
+      event.preventDefault();
+      closePage();
+      break;
+  }
+};
+
+const showShortcuts = () => {
+  const shortcutGroups = [
+    {
+      title: "书架页面",
+      items: [
+        { keys: ["R"], action: "刷新页面" },
+        { keys: ["X"], action: "关闭页面" }
+      ]
+    },
+    {
+      title: "阅读页面",
+      items: [
+        { keys: ["Q"], action: "返回书架" },
+        { keys: ["E"], action: "打开或关闭目录" },
+        { keys: ["R"], action: "刷新页面" },
+        { keys: ["X"], action: "关闭页面" },
+        { keys: ["A", "←"], action: "上一章" },
+        { keys: ["D", "→"], action: "下一章" },
+        { keys: ["W", "↑", "PgUp"], action: "向上翻页" },
+        { keys: ["S", "↓", "PgDn", "空格"], action: "向下翻页" }
+      ]
+    }
+  ];
+
+  ElMessageBox({
+    title: "快捷键",
+    message: h(
+      "div",
+      { class: "shortcut-help" },
+      shortcutGroups.map((group) =>
+        h("section", { class: "shortcut-section" }, [
+          h("div", { class: "shortcut-title" }, group.title),
+          h(
+            "div",
+            { class: "shortcut-list" },
+            group.items.map((item) =>
+              h("div", { class: "shortcut-row" }, [
+                h(
+                  "div",
+                  { class: "shortcut-keys" },
+                  item.keys.map((key) => h("kbd", key))
+                ),
+                h("div", { class: "shortcut-action" }, item.action)
+              ])
+            )
+          )
+        ])
+      )
+    ),
+    customClass: "shortcuts-message-box",
+    confirmButtonText: "知道了"
+  }).catch(() => {});
+};
+
 onMounted(() => {
+  window.addEventListener("keyup", handleKeyPress);
   //获取最近阅读书籍
   let readingRecentStr = localStorage.getItem("readingRecent");
   if (readingRecentStr != null) {
@@ -261,6 +468,10 @@ onMounted(() => {
       .finally(fetchBookShelfData)
   );
 });
+
+onUnmounted(() => {
+  window.removeEventListener("keyup", handleKeyPress);
+});
 const fetchBookShelfData = () => {
   return API.getBookShelf()
     .then((response) => {
@@ -273,25 +484,25 @@ const fetchBookShelfData = () => {
           return y - x;
         });
         store.addBooks(sortedBooks);
-        
+
         // 更新最近阅读 - 从服务器数据中获取最新的阅读记录
         if (sortedBooks.length > 0) {
           // 找到最近阅读的书（按阅读时间排序）
-          const latestBook = sortedBooks.find(book => book.durChapterTime) || sortedBooks[0];
-          
+          const latestBook = sortedBooks.find((book) => book.durChapterTime) || sortedBooks[0];
+
           // 如果有正在阅读的记录或者最近阅读的书存在，则更新
           if (latestBook && (latestBook.durChapterTime || readingRecent.value.url)) {
             // 检查是否是同一本书，如果是则更新进度；如果不是则以服务器数据为准
             const isSameBook = latestBook.bookUrl === readingRecent.value.url;
-            
+
             readingRecent.value = {
               name: latestBook.name || "尚无阅读记录",
               author: latestBook.author || "",
               url: latestBook.bookUrl || "",
               chapterIndex: latestBook.durChapterIndex || 0,
-              chapterPos: latestBook.durChapterPos || 0,
+              chapterPos: latestBook.durChapterPos || 0
             };
-            
+
             // 如果是同一本书且服务器进度更新，则使用服务器数据
             // 如果不是同一本书，则直接使用服务器数据（最近阅读的书）
             if (isSameBook) {
@@ -300,13 +511,13 @@ const fetchBookShelfData = () => {
             } else if (latestBook.bookUrl) {
               console.log(`切换最近阅读：${latestBook.name} - 第${latestBook.durChapterIndex}章`);
             }
-            
+
             // 更新 localStorage 以保持一致性
             localStorage.setItem("readingRecent", JSON.stringify(readingRecent.value));
           }
         }
       } else {
-        ElMessage.error(response.data.errorMsg);
+        showMessage.error(response.data.errorMsg);
       }
       store.setConnectStatus("已连接 ");
       store.setNewConnect(false);
@@ -314,7 +525,7 @@ const fetchBookShelfData = () => {
     .catch(function (error) {
       store.setConnectType("danger");
       store.setConnectStatus("连接失败");
-      ElMessage.error("后端连接失败");
+      showMessage.error("后端连接失败");
       store.setNewConnect(false);
       throw error;
     });
@@ -327,6 +538,9 @@ const fetchBookShelfData = () => {
   width: 100%;
   display: flex;
   flex-direction: row;
+  background-color: #ffffff;
+  --app-scrollbar-thumb: #b8a88f;
+  --app-scrollbar-thumb-hover: #9f8b6f;
 
   .navigation-wrapper {
     width: 260px;
@@ -334,10 +548,35 @@ const fetchBookShelfData = () => {
     padding: 48px 36px;
     background-color: #f7f7f7;
 
+    .navigation-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
     .navigation-title {
       font-size: 24px;
       font-weight: 500;
       font-family: FZZCYSK;
+    }
+
+    .theme-toggle {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 1px solid transparent;
+      border-radius: 50%;
+      background: transparent;
+      color: #b8a88f;
+      cursor: pointer;
+      font-family: iconfont;
+      font-size: 18px;
+      line-height: 26px;
+    }
+
+    .theme-toggle:hover {
+      border-color: #ed4259;
+      color: #ed4259;
     }
 
     .navigation-sub-title {
@@ -404,6 +643,23 @@ const fetchBookShelfData = () => {
         // color: #6B7C87;
         cursor: pointer;
       }
+
+      .setting-refresh,
+      .setting-shortcuts {
+        margin-left: 8px;
+      }
+
+      .setting-shortcuts {
+        border-color: #fdf6ec;
+        background-color: #fdf6ec;
+        color: #e6a23c;
+      }
+
+      .setting-shortcuts:hover {
+        border-color: #faecd8;
+        background-color: #faecd8;
+        color: #b88230;
+      }
     }
 
     .bottom-icons {
@@ -420,14 +676,130 @@ const fetchBookShelfData = () => {
   .shelf-wrapper {
     padding: 48px 48px;
     width: 100%;
+    background-color: #ffffff;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-color: var(--app-scrollbar-thumb) transparent;
+    scrollbar-width: auto;
+
+    &::-webkit-scrollbar {
+      width: 14px;
+      height: 14px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--app-scrollbar-thumb);
+      border: 3px solid transparent;
+      border-radius: 999px;
+      background-clip: content-box;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background-color: var(--app-scrollbar-thumb-hover);
+    }
   }
 }
 
+:global(.settings-message-box .el-message-box__message),
+:global(.settings-message-box .el-message-box__message > div),
+:global(.settings-message-box .el-message-box__message .el-input) {
+  width: 100%;
+}
+
+:global(.settings-message-box .el-message-box__container) {
+  display: block;
+}
+
+:global(.shortcuts-message-box .el-message-box__message),
+:global(.shortcuts-message-box .el-message-box__message > div) {
+  width: 100%;
+}
+
+:global(.shortcuts-message-box) {
+  width: auto;
+  min-width: 340px;
+  max-width: calc(100vw - 32px);
+}
+
+:global(.shortcuts-message-box .el-message-box__container) {
+  display: block;
+}
+
+:global(.shortcut-help) {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: max-content;
+  max-width: 100%;
+}
+
+:global(.shortcut-title) {
+  margin-bottom: 8px;
+  color: var(--el-text-color-primary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+:global(.shortcut-list) {
+  display: grid;
+  gap: 8px;
+}
+
+:global(.shortcut-row) {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  align-items: center;
+  gap: 12px;
+  color: var(--el-text-color-regular);
+  font-size: 13px;
+}
+
+:global(.shortcut-keys) {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  min-width: 0;
+}
+
+:global(.shortcut-keys kbd) {
+  flex: 0 0 auto;
+  min-width: 24px;
+  padding: 2px 6px;
+  border: 1px solid var(--el-border-color);
+  border-bottom-color: var(--el-border-color-darker);
+  border-radius: 4px;
+  background: var(--el-fill-color-light);
+  color: var(--el-text-color-primary);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+}
+
+:global(.shortcut-action) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 @media screen and (max-width: 750px) {
+  :global(.shortcut-row) {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  :global(.shortcut-action) {
+    white-space: normal;
+  }
+
   .index-wrapper {
     overflow-x: hidden;
     flex-direction: column;
@@ -467,10 +839,17 @@ const fetchBookShelfData = () => {
 }
 
 .night {
+  --app-scrollbar-thumb: #555b61;
+  --app-scrollbar-thumb-hover: #6f767d;
+
   :deep(.navigation-wrapper) {
     background-color: #454545;
     .navigation-title {
       color: #aeaeae;
+    }
+
+    .theme-toggle {
+      color: #b5b5b5;
     }
     .search-wrapper {
       .search-input {
@@ -482,9 +861,27 @@ const fetchBookShelfData = () => {
         }
       }
     }
+
+    .setting-wrapper {
+      .setting-shortcuts {
+        border-color: rgba(230, 162, 60, 0.16);
+        background-color: rgba(230, 162, 60, 0.16);
+        color: #d9a14f;
+      }
+
+      .setting-shortcuts:hover {
+        border-color: rgba(230, 162, 60, 0.24);
+        background-color: rgba(230, 162, 60, 0.24);
+        color: #e7b76b;
+      }
+    }
   }
-  :deep(.shelf-wrapper) {
+  .shelf-wrapper {
     background-color: #161819;
+  }
+
+  :deep(.shelf-wrapper .books-wrapper .wrapper .book .info .name) {
+    color: #b5b5b5;
   }
 }
 </style>

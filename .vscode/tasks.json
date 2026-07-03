@@ -1,0 +1,20 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "watch:all",
+      "group": "build",
+      "problemMatcher": [],
+      "label": "npm yarn run watch:all"
+    },
+    {
+      "type": "typescript",
+      "tsconfig": "tsconfig.json",
+      "option": "watch",
+      "problemMatcher": ["$tsc-watch"],
+      "group": "build",
+      "label": "tsc: 监视 - tsconfig.json"
+    }
+  ]
+}

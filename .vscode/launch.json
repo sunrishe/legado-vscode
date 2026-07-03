@@ -1,0 +1,49 @@
+{
+  // 使用 IntelliSense 了解相关属性。
+  // 悬停以查看现有属性的描述。
+  // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "VSCode 1.45.0",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--new-window",
+        "--user-data-dir",
+        "${workspaceFolder}/.debug/profile-145",
+        "--extensions-dir",
+        "${workspaceFolder}/.debug/exts-145",
+        "--disable-extensions",
+        "${workspaceFolder}/test-workspace-145"
+      ],
+      "sourceMaps": true,
+      "preLaunchTask": "npm: compile",
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "env": {
+        "VSCODE_API_TARGET": "1.45.0"
+      }
+    },
+    {
+      "name": "VSCode 最新版",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--new-window",
+        "--user-data-dir",
+        "${workspaceFolder}/.debug/profile-latest",
+        "--extensions-dir",
+        "${workspaceFolder}/.debug/exts-latest",
+        "--disable-extensions",
+        "${workspaceFolder}/test-workspace-latest"
+      ],
+      "sourceMaps": true,
+      "preLaunchTask": "npm: compile",
+      "outFiles": ["${workspaceFolder}/out/**/*.js"]
+    }
+  ]
+}

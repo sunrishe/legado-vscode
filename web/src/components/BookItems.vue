@@ -22,7 +22,10 @@
             <div class="author">
               {{ book.author }}
             </div>
-            <div class="tags" v-if="isSearch">
+            <div
+              class="tags"
+              v-if="isSearch"
+            >
               <el-tag
                 v-for="tag in book.kind?.split(',').slice(0, 2)"
                 :key="tag"
@@ -30,16 +33,27 @@
                 {{ tag }}
               </el-tag>
             </div>
-            <div class="update-info" v-if="!isSearch">
+            <div
+              class="update-info"
+              v-if="!isSearch"
+            >
               <div class="dot">•</div>
               <div class="size">共{{ book.totalChapterNum }}章</div>
               <div class="dot">•</div>
               <div class="date">{{ dateFormat(book.lastCheckTime) }}</div>
             </div>
           </div>
-          <div class="intro" v-if="isSearch">{{ book.intro }}</div>
+          <div
+            class="intro"
+            v-if="isSearch"
+          >
+            {{ book.intro }}
+          </div>
 
-          <div class="dur-chapter" v-if="!isSearch">
+          <div
+            class="dur-chapter"
+            v-if="!isSearch"
+          >
             已读：{{ book.durChapterTitle }}
           </div>
           <div class="last-chapter">最新：{{ book.latestChapterTitle }}</div>
@@ -57,25 +71,15 @@ const handleClick = (book) => emit("bookClick", book);
 const getCover = (coverUrl) => {
   return /^data:/.test(coverUrl)
     ? coverUrl
-    : WEB.getLegadoWebServeUrl() +
-        "/cover?path=" +
-        encodeURIComponent(coverUrl);
+    : WEB.getLegadoWebServeUrl() + "/cover?path=" + encodeURIComponent(coverUrl);
 };
 
-const subJustify = computed(() =>
-  props.isSearch ? "space-between" : "flex-start"
-);
+const subJustify = computed(() => (props.isSearch ? "space-between" : "flex-start"));
 </script>
 
 <style lang="scss" scoped>
 .books-wrapper {
-  overflow: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  overflow: visible;
 
   .wrapper {
     display: grid;
@@ -122,11 +126,21 @@ const subJustify = computed(() =>
         .sub {
           display: flex;
           flex-direction: row;
-          align-items: baseline;
+          align-items: center;
           justify-content: v-bind("subJustify");
           font-size: 12px;
           font-weight: 600;
+          line-height: 16px;
           color: #6b6b6b;
+
+          .author,
+          .update-info,
+          .date,
+          .dot,
+          .size {
+            line-height: 16px;
+          }
+
           .tags {
             :deep(.el-tag) {
               margin-right: 0.5em;
@@ -134,6 +148,8 @@ const subJustify = computed(() =>
           }
           .update-info {
             display: flex;
+            align-items: center;
+            white-space: nowrap;
             .dot {
               margin: 0 7px;
             }
@@ -167,10 +183,6 @@ const subJustify = computed(() =>
   .wrapper:last-child {
     margin-right: auto;
   }
-}
-
-.books-wrapper::-webkit-scrollbar {
-  width: 0 !important;
 }
 
 @media screen and (max-width: 750px) {

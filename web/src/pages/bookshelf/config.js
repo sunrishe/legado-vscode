@@ -1,17 +1,22 @@
 import API from "@api";
-import { useBookStore } from "@/store";
+import { applyReadConfig, loadLocalReadConfig, syncThemeWithColorMode } from "@/hooks/theme";
 import "@/assets/bookshelf.css";
 
 /**
  * 加载配置
  */
-API.getReadConfig().then((res) => {
-  var data = res.data.data;
-  if (data) {
-    const bookStore = useBookStore();
-    let config = JSON.parse(data);
-    let defaultConfig = bookStore.config;
-    config = Object.assign(defaultConfig, config);
-    bookStore.setConfig(config);
-  }
-});
+API.getReadConfig()
+  .then((res) => {
+    var data = res.data.data;
+    if (data) {
+      applyReadConfig(JSON.parse(data));
+    } else {
+      loadLocalReadConfig();
+    }
+    syncThemeWithColorMode();
+  })
+  .catch(() => {
+    // 后端未连接时仍使用本地配置和系统主题，保证页面主题显示正确
+    loadLocalReadConfig();
+    syncThemeWithColorMode(undefined, { upload: false });
+  });

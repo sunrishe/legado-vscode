@@ -20,7 +20,6 @@
     "@vueuse/shared": "^10.1.2",
     "axios": "^1.4.0",
     "element-plus": "^2.3.4",
-    "hotkeys-js": "^3.10.2",
     "pinia": "^2.0.36",
     "vue": "^3.3.2",
     "vue-router": "^4.2.0",
@@ -35,7 +34,6 @@
     "prettier": "^2.8.8",
     "sass": "^1.62.1",
     "unplugin-auto-import": "^0.16.0",
-    "unplugin-icons": "^0.16.1",
     "unplugin-vue-components": "^0.24.1",
     "vite": "^4.3.5"
   }

@@ -65,6 +65,7 @@
     "toRaw": true,
     "toRef": true,
     "toRefs": true,
+    "toValue": true,
     "triggerRef": true,
     "unref": true,
     "useAttrs": true,
@@ -75,11 +76,9 @@
     "useRoute": true,
     "useRouter": true,
     "useSlots": true,
-    "useSourceStore": true,
     "watch": true,
     "watchEffect": true,
     "watchPostEffect": true,
-    "watchSyncEffect": true,
-    "toValue": true
+    "watchSyncEffect": true
   }
 }

@@ -17,8 +17,15 @@
             ref="themes"
             @click="setTheme(index)"
             :class="{ selected: selectedTheme == index }"
-            ><em v-if="index < 6" class="iconfont">&#58980;</em
-            ><em v-else class="moon-icon">{{ moonIcon }}</em></span
+            ><em
+              v-if="index < 6"
+              class="iconfont"
+              >&#58980;</em
+            ><em
+              v-else
+              class="moon-icon"
+              >{{ moonIcon }}</em
+            ></span
           >
         </li>
         <li class="font-list">
@@ -31,6 +38,23 @@
             @change="saveFontColor"
             @active-change="changeFontColor"
           />
+        </li>
+        <li class="infinite-loading">
+          <i>无限加载</i>
+          <span
+            class="infinite-loading-item"
+            :key="0"
+            :class="{ selected: infiniteLoading == false }"
+            @click="setInfiniteLoading(false)"
+            >关闭</span
+          >
+          <span
+            class="infinite-loading-item"
+            :key="1"
+            :class="{ selected: infiniteLoading == true }"
+            @click="setInfiniteLoading(true)"
+            >开启</span
+          >
         </li>
         <li class="font-list">
           <i>正文字体</i>
@@ -45,7 +69,11 @@
         </li>
         <li class="font-list">
           <i>自定字体</i>
-          <el-tooltip effect="dark" content="自定义的字体名称" placement="top">
+          <el-tooltip
+            effect="dark"
+            content="自定义的字体名称"
+            placement="top"
+          >
             <input
               type="text"
               class="font-item font-item-input"
@@ -60,9 +88,7 @@
             trigger="click"
             v-model:visible="customFontSavePopVisible"
           >
-            <p>
-              请确认输入的字体名称完整无误，并且该字体已经安装在您的设备上。
-            </p>
+            <p>请确认输入的字体名称完整无误，并且该字体已经安装在您的设备上。</p>
             <p>确定保存吗？</p>
             <div style="text-align: right; margin: 0">
               <el-button
@@ -82,18 +108,26 @@
               >
             </div>
             <template #reference>
-              <span type="text" class="font-item">保存</span>
+              <span
+                type="text"
+                class="font-item"
+                >保存</span
+              >
             </template>
           </el-popover>
         </li>
         <li class="font-size">
           <i>字体大小</i>
           <div class="resize">
-            <span class="less" @click="lessFontSize"
+            <span
+              class="less"
+              @click="lessFontSize"
               ><em class="iconfont">&#58966;</em></span
             ><b></b> <span class="lang">{{ fontSize }}</span
             ><b></b>
-            <span class="more" @click="moreFontSize"
+            <span
+              class="more"
+              @click="moreFontSize"
               ><em class="iconfont">&#58976;</em></span
             >
           </div>
@@ -101,11 +135,15 @@
         <li class="letter-spacing">
           <i>字距</i>
           <div class="resize">
-            <span class="less" @click="lessLetterSpacing"
+            <span
+              class="less"
+              @click="lessLetterSpacing"
               ><em class="iconfont">&#58966;</em></span
             ><b></b> <span class="lang">{{ spacing.letter.toFixed(2) }}</span
             ><b></b>
-            <span class="more" @click="moreLetterSpacing"
+            <span
+              class="more"
+              @click="moreLetterSpacing"
               ><em class="iconfont">&#58976;</em></span
             >
           </div>
@@ -113,11 +151,15 @@
         <li class="line-spacing">
           <i>行距</i>
           <div class="resize">
-            <span class="less" @click="lessLineSpacing"
+            <span
+              class="less"
+              @click="lessLineSpacing"
               ><em class="iconfont">&#58966;</em></span
             ><b></b> <span class="lang">{{ spacing.line.toFixed(1) }}</span
             ><b></b>
-            <span class="more" @click="moreLineSpacing"
+            <span
+              class="more"
+              @click="moreLineSpacing"
               ><em class="iconfont">&#58976;</em></span
             >
           </div>
@@ -126,45 +168,38 @@
           <i>段距</i>
           <div class="resize">
             <div class="resize">
-              <span class="less" @click="lessParagraphSpacing"
+              <span
+                class="less"
+                @click="lessParagraphSpacing"
                 ><em class="iconfont">&#58966;</em></span
+              ><b></b> <span class="lang">{{ spacing.paragraph.toFixed(1) }}</span
               ><b></b>
-              <span class="lang">{{ spacing.paragraph.toFixed(1) }}</span
-              ><b></b>
-              <span class="more" @click="moreParagraphSpacing"
+              <span
+                class="more"
+                @click="moreParagraphSpacing"
                 ><em class="iconfont">&#58976;</em></span
               >
             </div>
           </div>
         </li>
-        <li class="read-width" v-if="!store.miniInterface">
+        <li
+          class="read-width"
+          v-if="!store.miniInterface"
+        >
           <i>页面宽度</i>
           <div class="resize">
-            <span class="less" @click="lessReadWidth"
+            <span
+              class="less"
+              @click="lessReadWidth"
               ><em class="iconfont">&#58965;</em></span
             ><b></b> <span class="lang">{{ readWidth }}</span
             ><b></b>
-            <span class="more" @click="moreReadWidth"
+            <span
+              class="more"
+              @click="moreReadWidth"
               ><em class="iconfont">&#58975;</em></span
             >
           </div>
-        </li>
-        <li class="infinite-loading">
-          <i>无限加载</i>
-          <span
-            class="infinite-loading-item"
-            :key="0"
-            :class="{ selected: infiniteLoading == false }"
-            @click="setInfiniteLoading(false)"
-            >关闭</span
-          >
-          <span
-            class="infinite-loading-item"
-            :key="1"
-            :class="{ selected: infiniteLoading == true }"
-            @click="setInfiniteLoading(true)"
-            >开启</span
-          >
         </li>
       </ul>
     </div>
@@ -174,62 +209,55 @@
 <script setup>
 import "../assets/fonts/popfont.css";
 import "../assets/fonts/iconfont.css";
-import settings from "../config/themeConfig";
-import API from "@api";
+import settings, {
+  DARK_FONT_COLOR,
+  LIGHT_FONT_COLOR,
+  getScrollbarTheme,
+  isDarkTheme
+} from "../config/themeConfig";
+import { saveReadConfig, setReadingTheme } from "@/hooks/theme";
 const store = useBookStore();
 
-const theme = ref(0);
-
-const isNight = ref(store.config.theme == 6);
-const moonIcon = ref("");
+const isNight = computed(() => isDarkTheme(store.config.theme));
+const moonIcon = computed(() => (isNight.value ? "" : ""));
 const themeColors = shallowRef([
   {
-    background: "rgba(250, 245, 235, 0.8)",
+    background: "rgba(250, 245, 235, 0.8)"
   },
   {
-    background: "rgba(245, 234, 204, 0.8)",
+    background: "rgba(245, 234, 204, 0.8)"
   },
   {
-    background: "rgba(230, 242, 230, 0.8)",
+    background: "rgba(230, 242, 230, 0.8)"
   },
   {
-    background: "rgba(228, 241, 245, 0.8)",
+    background: "rgba(228, 241, 245, 0.8)"
   },
   {
-    background: "rgba(245, 228, 228, 0.8)",
+    background: "rgba(245, 228, 228, 0.8)"
   },
   {
-    background: "rgba(224, 224, 224, 0.8)",
+    background: "rgba(224, 224, 224, 0.8)"
   },
   {
-    background: "rgba(0, 0, 0, 0.5)",
-  },
+    background: "rgba(0, 0, 0, 0.5)"
+  }
 ]);
-const moonIconStyle = ref({
-  display: "inline",
-  color: "rgba(255,255,255,0.2)",
-});
 const fonts = ref(["雅黑", "宋体", "楷书"]);
 const customFontName = ref(store.config.customFontName);
 const customFontSavePopVisible = ref(false);
 
-onMounted(() => {
-  //初始化设置项目
-  var config = store.config;
-  theme.value = config.theme;
-  if (theme.value == 6) {
-    moonIcon.value = "";
-  } else {
-    moonIcon.value = "";
-  }
-});
 const config = computed(() => {
   return store.config;
 });
 
 const popupTheme = computed(() => {
+  const scrollbarTheme = getScrollbarTheme(config.value.theme);
+
   return {
     background: settings.themes[config.value.theme].popup,
+    "--app-scrollbar-thumb": scrollbarTheme.thumb,
+    "--app-scrollbar-thumb-hover": scrollbarTheme.hover
   };
 });
 const selectedTheme = computed(() => {
@@ -240,19 +268,8 @@ const selectedFont = computed(() => {
 });
 
 const setTheme = (theme) => {
-  if (theme == 6) {
-    isNight.value = true;
-    moonIcon.value = "";
-    fontColor.value = config.value.fontColor = "#666";
-    moonIconStyle.value.color = "#ed4259";
-  } else {
-    isNight.value = false;
-    moonIcon.value = "";
-    fontColor.value = config.value.fontColor = "#262626";
-    moonIconStyle.value.color = "rgba(255,255,255,0.2)";
-  }
-  config.value.theme = theme;
-  saveConfig(config.value);
+  setReadingTheme(theme);
+  fontColor.value = config.value.fontColor;
 };
 const setFont = (font) => {
   config.value.font = font;
@@ -265,9 +282,15 @@ const setCustomFont = () => {
 };
 
 const fontColor = ref(config.value.fontColor);
+watch(
+  () => config.value.fontColor,
+  (color) => {
+    fontColor.value = color;
+  }
+);
 const saveFontColor = (color) => {
   if (!color) {
-    color = config.value.theme == 6 ? "#666" : "#262626";
+    color = isDarkTheme(config.value.theme) ? DARK_FONT_COLOR : LIGHT_FONT_COLOR;
   }
   fontColor.value = config.value.fontColor = color;
   saveConfig(config.value);
@@ -342,12 +365,7 @@ const setInfiniteLoading = (loading) => {
   saveConfig(config.value);
 };
 const saveConfig = (config) => {
-  store.setConfig(config);
-  localStorage.setItem("config", JSON.stringify(config));
-  uploadConfig(config);
-};
-const uploadConfig = (config) => {
-  API.saveReadConfig(config);
+  saveReadConfig(config);
 };
 </script>
 
@@ -382,6 +400,28 @@ const uploadConfig = (config) => {
   .setting-list {
     max-height: calc(70vh - 50px);
     overflow: auto;
+    scrollbar-color: var(--app-scrollbar-thumb) transparent;
+    scrollbar-width: auto;
+
+    &::-webkit-scrollbar {
+      width: 14px;
+      height: 14px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--app-scrollbar-thumb);
+      border: 3px solid transparent;
+      border-radius: 999px;
+      background-clip: content-box;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background-color: var(--app-scrollbar-thumb-hover);
+    }
 
     ul {
       list-style: none outside none;
@@ -440,8 +480,8 @@ const uploadConfig = (config) => {
           text-align: center;
           vertical-align: middle;
           display: inline-block;
-          font: 14px / 34px PingFangSC-Regular, HelveticaNeue-Light,
-            "Helvetica Neue Light", "Microsoft YaHei", sans-serif;
+          font: 14px / 34px PingFangSC-Regular, HelveticaNeue-Light, "Helvetica Neue Light",
+            "Microsoft YaHei", sans-serif;
         }
         .font-item-input {
           width: 168px;

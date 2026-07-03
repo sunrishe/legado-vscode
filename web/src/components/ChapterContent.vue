@@ -1,5 +1,11 @@
 <template>
-  <div class="title" data-chapterpos="0" ref="titleRef">{{ title }}</div>
+  <div
+    class="title"
+    data-chapterpos="0"
+    ref="titleRef"
+  >
+    {{ title }}
+  </div>
   <div
     v-for="(para, index) in contents"
     :key="index"
@@ -13,7 +19,11 @@
       @error.once="proxyImage"
       loading="lazy"
     />
-    <p v-else :style="{ fontFamily, fontSize }" v-html="para" />
+    <p
+      v-else
+      :style="{ fontFamily, fontSize }"
+      v-html="para"
+    />
   </div>
 </template>
 
@@ -28,6 +38,7 @@ const props = defineProps({
   spacing: { type: Object, required: true },
   fontFamily: { type: String, required: true },
   fontSize: { type: String, required: true },
+  scrollContainer: { type: Object, default: null }
 });
 
 const getImageSrc = (content) => {
@@ -58,18 +69,17 @@ const titleRef = ref();
 const paragraphRef = ref();
 const scrollToReadedLength = (length) => {
   if (length === 0) return;
-  let paragraphIndex = chapterPos.value.findIndex(
-    (wordCount) => wordCount >= length
-  );
+  let paragraphIndex = chapterPos.value.findIndex((wordCount) => wordCount >= length);
   if (paragraphIndex === -1) return;
   nextTick(() => {
     jump(paragraphRef.value[paragraphIndex], {
       duration: 0,
+      container: props.scrollContainer
     });
   });
 };
 defineExpose({
-  scrollToReadedLength,
+  scrollToReadedLength
 });
 let intersectionObserver = null;
 const emit = defineEmits(["readedLengthChange"]);
@@ -78,16 +88,15 @@ onMounted(() => {
     (entries) => {
       for (let { target, isIntersecting } of entries) {
         if (isIntersecting) {
-          emit(
-            "readedLengthChange",
-            props.chapterIndex,
-            parseInt(target.dataset.chapterpos)
-          );
+          emit("readedLengthChange", props.chapterIndex, parseInt(target.dataset.chapterpos));
         }
       }
     },
     {
-      rootMargin: `0px 0px -${window.innerHeight - 24}px 0px`,
+      root: props.scrollContainer || null,
+      rootMargin: `0px 0px -${
+        (props.scrollContainer?.clientHeight || window.innerHeight) - 24
+      }px 0px`
     }
   );
   intersectionObserver.observe(titleRef.value);
@@ -105,14 +114,15 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 .title {
   margin-bottom: 57px;
-  font: 24px / 32px PingFangSC-Regular, HelveticaNeue-Light,
-    "Helvetica Neue Light", "Microsoft YaHei", sans-serif;
+  font: 24px / 32px PingFangSC-Regular, HelveticaNeue-Light, "Helvetica Neue Light",
+    "Microsoft YaHei", sans-serif;
 }
 
 p {
   display: block;
   word-wrap: break-word;
   word-break: break-all;
+  text-align: justify;
 
   letter-spacing: calc(v-bind("props.spacing.letter") * 1em);
   line-height: calc(1 + v-bind("props.spacing.line"));

@@ -3,18 +3,18 @@ module.exports = {
   env: {
     browser: true,
     es2021: true,
-    node: true,
+    node: true
   },
   extends: [
     "plugin:vue/vue3-essential",
     "eslint:recommended",
     "plugin:prettier/recommended",
-    "./.eslintrc-auto-import.json",
+    "./.eslintrc-auto-import.json"
   ],
   parserOptions: {
-    ecmaVersion: "latest",
+    ecmaVersion: "latest"
   },
   rules: {
-    "no-unused-vars": "warn",
-  },
+    "no-unused-vars": "warn"
+  }
 };

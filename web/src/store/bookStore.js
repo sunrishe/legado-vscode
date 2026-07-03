@@ -26,11 +26,11 @@ export const useBookStore = defineStore("book", {
         spacing: {
           paragraph: 1,
           line: 0.8,
-          letter: 0,
-        },
+          letter: 0
+        }
       },
       miniInterface: false,
-      readSettingsVisible: false,
+      readSettingsVisible: false
     };
   },
   getters: {
@@ -46,9 +46,9 @@ export const useBookStore = defineStore("book", {
         durChapterIndex: index,
         durChapterPos: chapterPos,
         durChapterTime: new Date().getTime(),
-        durChapterTitle: title,
+        durChapterTitle: title
       };
-    },
+    }
   },
   actions: {
     setConnectStatus(connectStatus) {
@@ -102,6 +102,6 @@ export const useBookStore = defineStore("book", {
     async saveBookProgress() {
       if (!this.bookProgress) return Promise.resolve();
       return API.saveBookProgress(this.bookProgress);
-    },
-  },
+    }
+  }
 });

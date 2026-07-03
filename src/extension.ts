@@ -14,7 +14,11 @@ export function activate(context: vscode.ExtensionContext) {
     WebAppPanel.createOrShow(context.extensionUri);
   });
 
-  context.subscriptions.push(openVueApp);
+  let closeVueApp = vscode.commands.registerCommand("legado-vscode.closeLegado", () => {
+    WebAppPanel.kill();
+  });
+
+  context.subscriptions.push(openVueApp, closeVueApp);
 }
 
 // This method is called when your extension is deactivated

@@ -32,6 +32,9 @@ export class WebAppPanel {
 
     // Handle messages from the webview
     this._panel.webview.onDidReceiveMessage(this._messageListener, null, this._disposables);
+    this._disposables.push(
+      vscode.window.onDidChangeActiveColorTheme((theme) => this._postColorMode(theme))
+    );
   }
 
   public static createOrShow(extensionUri: vscode.Uri) {
@@ -72,6 +75,15 @@ export class WebAppPanel {
     WebAppPanel.currentPanel = undefined;
   }
 
+  public reload() {
+    this._panel.webview.html = "";
+    setTimeout(() => this._update(), 0);
+  }
+
+  public setPanelTitle(title: string) {
+    this._panel.title = title;
+  }
+
   public dispose() {
     WebAppPanel.currentPanel = undefined;
 
@@ -95,9 +107,15 @@ export class WebAppPanel {
         vscode.workspace
           .getConfiguration()
           .update(message.key, message.value, vscode.ConfigurationTarget.Global);
+        if (message.key === "legado-vscode.panelTitle") {
+          WebAppPanel.currentPanel?.setPanelTitle(message.value);
+        }
         return;
       case "reload":
-        WebAppPanel.currentPanel?._update();
+        WebAppPanel.currentPanel?.reload();
+        return;
+      case "close":
+        WebAppPanel.kill();
         return;
     }
   }
@@ -107,11 +125,29 @@ export class WebAppPanel {
     this._panel.webview.html = this._getHtmlForWebview(webview);
   }
 
+  private _postColorMode(theme = vscode.window.activeColorTheme) {
+    this._panel.webview.postMessage({
+      command: "colorMode",
+      value: this._getColorMode(theme)
+    });
+  }
+
+  private _getColorMode(theme = vscode.window.activeColorTheme) {
+    return theme.kind === vscode.ColorThemeKind.Dark ||
+      theme.kind === vscode.ColorThemeKind.HighContrast
+      ? "dark"
+      : "light";
+  }
+
   private _getHtmlForWebview(webview: vscode.Webview) {
     const baseUri = getUri(webview, this._extensionUri, ["web", "dist"]).toString();
     let webServeUrl: string =
       vscode.workspace.getConfiguration().get("legado-vscode.webServeUrl") || "";
     webServeUrl = webServeUrl.replace(/^\s+|[\/\s]+$/, "");
+    let panelTitle: string =
+      vscode.workspace.getConfiguration().get("legado-vscode.panelTitle") || "阅读";
+    panelTitle = panelTitle.replace(/^\s+|\s+$/g, "");
+    const colorMode = this._getColorMode();
 
     return /*html*/ `
       <!DOCTYPE html>
@@ -121,7 +157,9 @@ export class WebAppPanel {
           <link rel="icon" href="${baseUri}/favicon.ico" />
           <meta name="viewport" content="width=device-width,initial-scale=1.0" />
           <script type="text/javascript">
-            localStorage.setItem("legadoWebServeUrl", "${webServeUrl}");
+            localStorage.setItem("legadoWebServeUrl", ${JSON.stringify(webServeUrl)});
+            localStorage.setItem("legadoPanelTitle", ${JSON.stringify(panelTitle)});
+            localStorage.setItem("legadoColorMode", ${JSON.stringify(colorMode)});
           </script>
           <script type="module" crossorigin src="${baseUri}/assets/index.js"></script>
           <link rel="modulepreload" crossorigin href="${baseUri}/assets/vendor.js">

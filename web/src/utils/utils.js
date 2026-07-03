@@ -3,11 +3,7 @@ import WEB from "@/api/web";
 
 export const isLegadoUrl = (/** @type {string} */ url) =>
   /,\s*\{/.test(url) ||
-  !(
-    url.startsWith("http") ||
-    url.startsWith("data:") ||
-    url.startsWith("blob:")
-  );
+  !(url.startsWith("http") || url.startsWith("data:") || url.startsWith("blob:"));
 /**
  * @param {string} src
  */
