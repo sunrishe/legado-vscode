@@ -1,7 +1,6 @@
 import API from "@api";
 import {
   applyReadConfig,
-  getLocalReadConfig,
   loadLocalReadConfig,
   syncThemeWithColorMode
 } from "@/hooks/theme";
@@ -11,16 +10,11 @@ const applyInitialReadConfig = (appConfigData) => {
   if (appConfigData) {
     try {
       applyReadConfig(JSON.parse(appConfigData));
-      return;
     } catch {
-      localStorage.removeItem("config");
     }
   }
 
-  const localConfig = getLocalReadConfig();
-  if (localConfig) {
-    applyReadConfig(localConfig);
-  }
+  loadLocalReadConfig();
 };
 
 /**
