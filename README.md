@@ -17,7 +17,7 @@
 
 ## 功能
 
-> 配合[阅读APP](https://github.com/gedoor/legado.git)用来学习的阅读插件，并在阅读APP的WEB服务基础上，书架页面增加了暗黑模式，章节阅读页面增加 <kbd>W</kbd> <kbd>S</kbd> <kbd>A</kbd> <kbd>D</kbd> 进行翻页控制。
+> 配合[阅读APP](https://github.com/LegadoTeam/legado.git)用来学习的阅读插件，并在阅读APP的WEB服务基础上，书架页面增加了暗黑模式，章节阅读页面增加 <kbd>W</kbd> <kbd>S</kbd> <kbd>A</kbd> <kbd>D</kbd> 进行翻页控制。
 >
 > 😎悄悄地告诉你，阅读界面打开`无限加载`食用更佳哦~
 
@@ -82,6 +82,7 @@
 首次接触VS Code插件开发，非常感谢他们对我的帮助。
 
 [gedoor/legado](https://github.com/gedoor/legado.git)
+[LegadoTeam/legado](https://github.com/LegadoTeam/legado.git)
 [微软官方](https://github.com/microsoft/vscode-webview-ui-toolkit-samples.git)
 [CODE Magazine](https://www.codemag.com/article/2107071)
 [Mhdi-kr/vscode-webvue](https://github.com/Mhdi-kr/vscode-webvue.git)

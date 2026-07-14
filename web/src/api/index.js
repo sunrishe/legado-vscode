@@ -1,8 +1,8 @@
 import ajax from "./axios";
 import WEB from "@/api/web";
 
-/** https://github.com/gedoor/legado/tree/master/app/src/main/java/io/legado/app/api */
-/** https://github.com/gedoor/legado/tree/master/app/src/main/java/io/legado/app/web */
+/** https://github.com/LegadoTeam/legado/tree/master/app/src/main/java/io/legado/app/api */
+/** https://github.com/LegadoTeam/legado/tree/master/app/src/main/java/io/legado/app/web */
 
 const { hostname, port } = new URL(WEB.getLegadoWebServeUrl());
 
