@@ -4,6 +4,13 @@
 
 格式是基于[Keep a Changelog](https://keepachangelog.com/en/1.0.0/)，这个项目坚持[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.5] - 2026-07-14
+
+### 修复
+
+- 修复阅读配置被重置问题
+- 更新Legado仓库地址
+
 ## [2.9.3] - 2026-07-04
 
 ### 新增
