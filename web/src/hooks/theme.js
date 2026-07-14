@@ -40,22 +40,29 @@ export const getColorMode = () => {
 export const applyReadConfig = (config) => {
   if (!config) return;
   const store = useBookStore();
-  const nextConfig = Object.assign({}, store.config, config);
+  const nextConfig = Object.assign({}, store.config, config, {
+    spacing: Object.assign({}, store.config.spacing, config.spacing)
+  });
   store.setConfig(nextConfig);
   return nextConfig;
 };
 
-export const loadLocalReadConfig = () => {
+export const getLocalReadConfig = () => {
   try {
-    return applyReadConfig(JSON.parse(localStorage.getItem(READ_CONFIG_STORAGE_KEY)));
+    return JSON.parse(localStorage.getItem(READ_CONFIG_STORAGE_KEY));
   } catch {
     localStorage.removeItem(READ_CONFIG_STORAGE_KEY);
   }
 };
 
+export const loadLocalReadConfig = () => {
+  return applyReadConfig(getLocalReadConfig());
+};
+
 export const saveReadConfig = (config, options = {}) => {
   const { upload = true } = options;
   const nextConfig = applyReadConfig(config);
+  if (!nextConfig) return;
   localStorage.setItem(READ_CONFIG_STORAGE_KEY, JSON.stringify(nextConfig));
   if (upload) {
     API.saveReadConfig(nextConfig).catch(() => {});
@@ -73,7 +80,7 @@ export const syncThemeWithColorMode = (mode = getColorMode(), options = {}) => {
   const store = useBookStore();
   const config = Object.assign({}, store.config);
   const wasDark = isDarkTheme(config.theme);
-  const { upload = true } = options;
+  const { upload = true, persist = true } = options;
   let changed = false;
 
   applyElementPlusTheme(colorMode);
@@ -91,7 +98,11 @@ export const syncThemeWithColorMode = (mode = getColorMode(), options = {}) => {
   }
 
   if (changed) {
-    saveReadConfig(config, { upload });
+    if (persist) {
+      saveReadConfig(config, { upload });
+    } else {
+      applyReadConfig(config);
+    }
   }
 };
 
@@ -118,7 +129,8 @@ export const toggleColorMode = () => {
 };
 
 export const initThemeSync = () => {
-  syncThemeWithColorMode(undefined, { upload: false });
+  loadLocalReadConfig();
+  syncThemeWithColorMode(undefined, { upload: false, persist: false });
 
   if (!isVscodeWebview()) {
     const mediaQuery = window.matchMedia?.(DARK_MODE_MEDIA_QUERY);

@@ -8,3 +8,4 @@ node_modules.zip
 *.vsix
 
 yarn-*.log
+package-lock.json
